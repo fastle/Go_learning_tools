@@ -1,0 +1,4 @@
+go run ./learning/dup3/dup3.go D:\bq\Go_learning_tools\learning\dup3\note.txt
+go run ./learning/dup3/dup3.go D:\bq\Go_learning_tools\learning\dup3\note.txt
+go run ./learning/dup3/dup3.go D:\bq\Go_learning_tools\learning\dup3\note.txt
+go run ./learning/dup3/dup3.go D:\bq\Go_learning_tools\learning\dup3\note.txt

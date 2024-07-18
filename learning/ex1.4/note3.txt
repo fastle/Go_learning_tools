@@ -1,0 +1,1 @@
+go run ./learning/ex1.4/ex1.4.go D:\bq\Go_learning_tools\learning\ex1.4\note.txt

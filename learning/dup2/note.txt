@@ -1,0 +1,2 @@
+go run ./learning/dup2/dup2.go D:\bq\Go_learning_tools\learning\dup2\note.txt
+go run ./learning/dup2/dup2.go D:\bq\Go_learning_tools\learning\dup2\note.txt
