@@ -474,8 +474,248 @@ func lissajous(out io.Writer){
 	}
 	gif.EncodeAll(out, &anim)
 }
-	
 ```
+
+## 获取一个URL
+```go
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		resp, err := http.Get(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			os.Exit(1)
+		}
+		b, err := io.ReadAll(resp.Body) // ioutil包现在是io包
+		resp.Body.Close() //关闭数据流来避免资源泄漏，
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch reading: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s", b)
+	}
+}
+```
+
+```go
+// 练习1.7
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		resp, err := http.Get(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch:%v\n", err)
+			os.Exit(1)
+		}
+		_, err = io.Copy(os.Stdout, resp.Body)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "copy%v\n", err)
+		}
+		resp.Body.Close()
+	}
+
+}
+```
+
+```go
+\\ 练习1.8
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"strings"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		if ! strings.HasPrefix(url, "http://") && ! strings.HasPrefix(url, "https://") {
+			url = "http://" + url
+		}
+		resp, err := http.Get(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			os.Exit(0)
+		}
+		io.Copy(os.Stdout, resp.Body)
+		resp.Body.Close()
+	}
+}
+
+```
+
+
+```go
+\\ 练习1.9
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		resq, err := http.Get(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch %v\n", err)
+			os.Exit(0)
+		}
+		fmt.Printf("%v\n", resq.StatusCode) // 状态码， StatusCode
+		resq.Body.Close()
+	}
+}
+```
+
+## 服务器
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func main() {
+	http.HandleFunc("/", handler) // 使用handler函数 处理所有请求
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))// 先打印日志到标准输出， 调用os.exit(1), 到那时defer函数不会被调用
+}
+
+func handler(w http.ResponseWriter, r *http.Request){ // handler格式， 
+	fmt.Fprintf(w, "URL.Path = %q\n", r.URL.Path)
+
+}
+
+
+
+```
+
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"sync"
+)
+
+var mu sync.Mutex
+var count int 
+
+
+func main() {
+	http.HandleFunc("/", handler) 
+	http.HandleFunc("/count", counter)
+	log.Fatal(http.ListenAndServe("localhost:8000", nil)) // Listen
+}
+
+/*
+出现问题， 使用浏览器访问的时候会调用两次接口
+原因是图标也算一次
+不用浏览器访问就好啦
+
+
+*/
+
+
+func handler(w http.ResponseWriter, r *http.Request){
+	mu.Lock()
+	count++
+	fmt.Fprintf(w, "Count %d ffff \n", count)
+	mu.Unlock()
+}
+
+func counter(w http.ResponseWriter, r *http.Request){
+	mu.Lock()
+	fmt.Fprintf(w, "Count %d\n", count)
+	mu.Unlock()
+}
+
+```
+
+```go
+// 更完整的例子， 报告接收到的消息头和表单数据
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+
+func main(){
+	http.HandleFunc("/", handle)
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+
+func handle(w http.ResponseWriter, r *http.Request){ // 前者输出， 后者输入
+
+	fmt.Fprintf(w, "%s %s %s\n", r.Method, r.URL, r.Proto)
+	for k, v := range r.Header{
+		fmt.Fprintf(w, "Header[%q] = %q\n", k, v)
+	}
+	fmt.Fprintf(w, "Host = %q\n", r.Host)
+	fmt.Fprintf(w, "RemoteAddr = %q\n", r.RemoteAddr)
+	if err := r.ParseForm(); err != nil{ // 将err := r.ParseForm() 嵌入到if 判断条件前， 作用域缩小
+		log.Print(err)
+	}
+	for k, v := range r.Form {
+		fmt.Fprintf(w, "Form[%q] = %q\n", k, v)
+	}
+	
+}
+```
+### http.Request 包含内容
+- Header type Header map[string][]string
+- Body 请求体
+- GetBody 返回Body的新副本
+- ContentLength int64 关联内容长度
+- TransferEncoding []string  列出了从最外层到最内层的传输编码， 一般会被忽略，当发送或者接受请求时，会自动添加或者移除”chunked“传输编码
+- Close bool 连接结束后是否关闭
+- Host string 服务器主机地址
+- Form url.Values 表单数据
+- PostForm url.Values  也是表单
+- MultipartForm *multipaort.Form  解析多部分表单
+- Trailer Header 表示在请求体后添加附加头
+- RemoteAddr string 
+- RequestURL string
+- TLS *tls.ConnectionState
+- Cancel <-chan struct{} 一个可选通道
+- Response * Response 此请求的重定向响应
+
+## 控制流
+- if for switch(switch 不需要加break) 可以通过加fallthrough来连接到下一级
+- switch 可以允许不带对象
+- switch 可以紧跟简短变量声明
+
+
+## go doc 
+- 可以在本地直接命令行阅读标准库的文档。
+- 建议：在源文件的开头写注释， 每一个函数之前写一个说明函数行为的注释， 容易使得被godoc这样的工具检测到
 # go-kit 基础服务
 
 # Others
