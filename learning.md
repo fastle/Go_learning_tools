@@ -724,7 +724,128 @@ func handle(w http.ResponseWriter, r *http.Request){ // 前者输出， 后者�
 - 概念的完整性，是指针对于一个领域，不仅了解该领域的所有对象，并且了解所有对象之间的关系。
 - 了解所有对象之间的关系，并不是感性了解，而是理性了解，并不是将所有的信息都知道就可以了，需要达到一定的理性认识，达到一定的抽象才行。
 
+# 第二章
+- 实体的第一个字母的大小写决定其可见性是否跨包， 如果是大写开头， 说明是导出的， 可以被自己包之外的其他程序所调用
+- 包名称永远是小写纯字母
+- 名称的作用域越大，就使用越长且更有意义的名称
+- 驼峰式命名法，首字母缩写词往往使用相同的大小写
+- go中不允许出现未被定义的变量， 所有类型的变量都应当有直接可用的零值
+
 ```go
+package main
+
+import "fmt"
+
+func main() {
+	const freezingF, boilingF = 32.0, 212.0
+	fmt.Printf("freezing %g C\n",fToC(freezingF))
+	fmt.Printf("boiling %g C\n", fToC(boilingF))
+}
 
 
+func fToC(f float64) float64{
+	return (f -32) * 5 / 9
+}
+```
+
+
+```go
+package main
+
+import "fmt"
+
+const boilingF = 212.0
+
+func main() {
+	var f = boilingF
+	var c = (f - 32) * 5 / 9
+	fmt.Printf("boiling point = %g F or %g C\n", f, c)
+}
+
+```
+
+```go
+// 第四版
+package main
+
+import (
+	"flag"
+	"fmt"
+	"strings"
+)
+
+var n = flag.Bool("n", false, "omit trailing newline")
+var sep = flag.String("s", " ", "separator")
+
+
+func main(){
+	flag.Parse()
+	fmt.Print(strings.Join(flag.Args(), *sep))
+	if !*n {
+		fmt.Println()
+	}
+}
+
+
+```
+
+
+### 类型声明
+- type name underlying-type
+- 一般会放在函数外面全包使用， 若首字母大写则可导出包外
+
+```go
+// 进行摄氏温度和华氏温度的转换
+package main
+
+
+type Celsius float64
+type Fahrenheit float64
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}  // 构造时若两个底层是相同类型可以直接构造
+func FtoC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
+```
+
+
+- 命名类型之后类似于继承，可以重新定义类型的行为， 类似于下面
+```go
+func (c Celsius) String() string() {return fmt.Sprintf("%g°C", c)} // fmt 在将元素输出时，会优先调用函数的toString（）方法
+```
+
+
+### 包
+- 每个包对应一个独立的命名空间， 需要明确指出包来调用， 只有名字以大写字母开头的信息才是导出的， （汉字不导出）
+
+- 可以将之前的代码分成两个文件， 并且导出包
+
+```go
+// 用于进行摄氏度与华氏度之间的转换   tempconv.go
+package tempconv 
+
+
+type Celsius float64
+type Fahrenheit float64
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+```
+
+```go 
+package tempconv // conv.go
+
+// 摄氏度转华氏度
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}  // 构造时若两个底层是相同类型可以直接构造
+
+// 华氏度转摄氏度
+func FtoC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
 ```
