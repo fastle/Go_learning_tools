@@ -788,7 +788,7 @@ func main(){
 
 
 ```
-
+- flag包简介：https://www.cnblogs.com/sparkdev/p/10812422.html
 
 ### 类型声明
 - type name underlying-type
@@ -848,4 +848,388 @@ func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}  // 构造�
 
 // 华氏度转摄氏度
 func FtoC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
+```
+
+- flag 
+
+```go
+// 练习2.1 注意函数复用
+// 进行摄氏温度和华氏温度以及绝对温度的转换
+package main
+
+
+type Celsius float64
+type Fahrenheit float64
+type Kelvin float64 
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}  // 构造时若两个底层是相同类型可以直接构造
+func FtoC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
+func KtoC(k Kelvin) Celsius {return Celsius(k + Kelvin(AbsoluteZeroC))}
+func KtoF(k Kelvin) Fahrenheit {return Fahrenheit(CToF(KtoC(k)))}
+func CtoK(c Celsius) Kelvin {return Kelvin(c - AbsoluteZeroC)}
+func FtoK(f Fahrenheit) Kelvin {return CtoK(FtoC(f))}
+```
+
+
+### 导入包
+
+```go
+
+// 导入tempconv包
+package main
+
+import (
+	"fmt"
+	"os"
+	"strconv"
+
+	"./learning/tempconv" // go 调用不同位置的包 ，https://blog.csdn.net/Working_hard_111/article/details/139982343
+)
+
+func main(){
+	for _, arg := range os.Args[1:]{
+		t, err := strconv.ParseFloat(arg, 64)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "cf: %v\n", err)
+			os.Exit(1)
+		}
+		f := tempconv.Fahrenheit(t)
+		c := tempconv.Celsius(t)
+		fmt.Printf("%s = %s, %s = %s\n", f, tempconv.FtoC(f), c, tempconv.CToF(c))
+	}
+}
+```
+
+- 包的初始化， 使用init（）函数， 该函数不能被调用或者引用， 每个文件中init初始化函数在程序执行的时候直接调用
+```go
+// 用来统计输入数的二进制1数目
+package popcount
+
+var pc [256]byte 
+
+func init(){
+	for i := range pc { // 直接可以将slice当参数
+		pc[i] = pc[i / 2] + byte(i & 1) // byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数
+	}
+}
+
+func PopCount(x uint64) int{
+	return int(pc[byte(x >> (0 * 8))] +
+		pc[byte(x >> (1 * 8))] +
+		pc[byte(x >> (2 * 8))] +
+		pc[byte(x >> (3 * 8))] +
+		pc[byte(x >> (4 * 8))] +
+		pc[byte(x >> (5 * 8))] +
+		pc[byte(x >> (6 * 8))] +
+		pc[byte(x >> (7 * 8))])
+}
+```
+
+
+#### 练习2.3
+- 重写PopCount函数，用一个循环代替单一的表达式。比较两个版本的性能。（11.4节将展示如何系统地比较两个不同实现的性能。）
+
+```go
+// 用来统计输入数的二进制1数目
+package popcount
+
+var pc [256]byte 
+
+func init(){
+	for i := range pc { // 直接可以将slice当参数
+		pc[i] = pc[i / 2] + byte(i & 1) // byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数
+	}
+}
+
+func PopCount(x uint64) int{
+
+	ans := 0
+	for i := 0 ; i < 8; i++ {  // 写成循环形式
+		ans += int(byte(x >> (i * 8)))
+	}
+	return ans
+}
+```
+
+#### 练习2.4 
+-  用移位算法重写PopCount函数，每次测试最右边的1bit，然后统计总数。比较和查表算法的性能差异。
+
+```go
+// 用来统计输入数的二进制1数目
+package popcount
+
+var pc [256]byte 
+
+func init(){
+	for i := range pc { // 直接可以将slice当参数
+		pc[i] = pc[i / 2] + byte(i & 1) // byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数
+	}
+}
+
+func PopCount(x uint64) int{
+
+	ans := 0
+	for ; x != 0 ; x >>= 1{   // 每次右移一位
+		if x & 1 == 1{
+			ans ++
+		}
+	}
+	return ans
+}
+
+```
+
+#### 练习2.5
+- 表达式x&(x-1)用于将x的最低的一个非零的bit位清零。使用这个算法重写PopCount函数，然后比较性能。
+
+```go
+// 用来统计输入数的二进制1数目
+package popcount
+
+var pc [256]byte 
+
+func init(){
+	for i := range pc { // 直接可以将slice当参数
+		pc[i] = pc[i / 2] + byte(i & 1) // byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数
+	}
+}
+
+func PopCount(x uint64) int{
+
+	ans := 0
+	for ; x != 0 ; x = x & (x - 1){   // x - lowbit(x)
+			ans ++
+	}
+	return ans
+}
+```
+
+### 作用域
+- 作用域不等于生命周期， 作用域是编码阶段的概念，生命周期是运行时的概念
+- go 中编译器会一层层地向外搜寻合适的范围， 
+- for, if, switch 会产生新的词法域
+- 这个部分要注意好的编码习惯， 尽量不用相同的变量名， 但是go是允许使用相同的变量名的
+
+# 第三章
+
+- Go语言数据类型分为四类： 基础类型、复合类型、引用类型和接口类型
+- 基础类型： 数字、 字符串、 bool型、 
+- 复合类型：数组、结构体、
+- 引用类型： 指针、 切片、 字典、 函数、 通道
+- 接口类型： 第七章
+
+## 数据类型
+- Go 在运算时要求比较严格，只允许相同类型的进行运算
+- 整型分为 有符号和无符号， 每种都分为 8，16，32，64位
+- 还有一种对应CPU平台的类型， int和 uint
+- 还用一种无符号的整数类型uintptr, 没有具体的bit大小但是足以容纳指针
+- 浮点数转整数的方式是丢弃小数部分， 然后向数轴方向折断
+- 浮点数只有两种， float32 和float64
+- Nan 的比较总是不成立， 但是！= 会成立
+- 浮点数输出可以有%e 科学计数法， %f 小数点， 两种方法， 使用%g可以自动生成
+
+## 运算符
+
+- 基本上和c++ 相同
+- &^  为位清空操作
+
+
+
+## 实例
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+const (
+	width, height = 600, 320
+	cells         = 100
+	xyrange       = 30.0
+	xyscale       = width / 2 / xyrange
+	zscale        = height * 0.4
+	angle         = math.Pi / 6
+)
+var sin30 = math.Sin(angle) // Go的常量是在编译之前就能确定的常量
+var cos30 = math.Cos(angle)
+
+
+
+func main() {
+	fmt.Printf("<svg xmlns='http://www.w3.org/2000/svg' "+
+        "style='stroke: grey; fill: white; stroke-width: 0.7' "+
+        "width='%d' height='%d'>", width, height)
+	for i:= 0; i < cells; i++ {
+		for j := 0; j < cells; j++ {
+			ax, ay := corner(i + 1, j)
+			bx, by := corner(i, j)
+			cx, cy := corner(i, j + 1)
+			dx, dy := corner(i + 1, j + 1)
+			fmt.Printf("<polygon points='%g,%g %g,%g %g,%g %g,%g'/>\n",
+                ax, ay, bx, by, cx, cy, dx, dy)
+		}
+	}
+	fmt.Println("</svg>")
+}
+
+func corner(i, j int) (float64, float64) { // 返回网格顶点的坐标参数
+	x := xyrange * (float64(i) / cells - 0.5)
+	y := xyrange * (float64(j) / cells - 0.5)
+	z := f(x, y)
+	sx := width / 2 + (x - y) * cos30 * xyscale
+	sy := height / 2 + (x + y) * sin30 * xyscale - z * zscale
+	return sx, sy
+}
+
+func f(x, y float64) float64 {
+	r := math.Hypot(x, y)
+	return math.Sin(r) / r
+}
+```
+
+
+### 练习3.1
+- 如果f函数返回的是无限制的float64值，那么SVG文件可能输出无效的多边形元素（虽然许多SVG渲染器会妥善处理这类问题）。修改程序跳过无效的多边形。
+
+```go
+\\ 更改的代码
+
+func main() {
+	fmt.Printf("<svg xmlns='http://www.w3.org/2000/svg' "+
+        "style='stroke: grey; fill: white; stroke-width: 0.7' "+
+        "width='%d' height='%d'>", width, height)
+	for i:= 0; i < cells; i++ {
+		for j := 0; j < cells; j++ {
+			ax, ay := corner(i + 1, j)
+			bx, by := corner(i, j)
+			cx, cy := corner(i, j + 1)
+			dx, dy := corner(i + 1, j + 1)
+			if math.IsNaN(ax) || math.IsNaN(ay) || math.IsNaN(bx) || math.IsNaN(by) || math.IsNaN(cx) || math.IsNaN(cy) || math.IsNaN(dx) || math.IsNaN(dy) {
+				fmt.Fprintf(os.Stderr, "NAN")
+			} else {
+				fmt.Printf("<polygon points='%g,%g %g,%g %g,%g %g,%g'/>\n",
+                ax, ay, bx, by, cx, cy, dx, dy)
+			}
+		}
+	}
+	fmt.Println("</svg>")
+}
+
+```
+
+### 练习3.2
+- 试验math包中其他函数的渲染图形。你是否能输出一个egg box、moguls或a saddle图案?
+
+```go
+// 更改一下z轴函数即可
+
+
+func corner(i, j int) (float64, float64) {
+	x := xyrange * (float64(i) / cells - 0.5)
+	y := xyrange * (float64(j) / cells - 0.5)
+	//z := f(x, y)
+	z := eggBox(x, y)
+	sx := width / 2 + (x - y) * cos30 * xyscale
+	sy := height / 2 + (x + y) * sin30 * xyscale - z * zscale
+	return sx, sy
+}
+
+
+func eggBox(x, y float64) float64 {
+	return math.Sin(x) + math.Sin(y) / 10
+}
+```
+
+### 练习3.3
+- 根据高度给每个多边形上色，那样峰值部将是红色（#ff0000），谷部将是蓝色（#0000ff）。
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+	"os"
+)
+
+const (
+	width, height = 600, 320
+	cells         = 100
+	xyrange       = 30.0
+	xyscale       = width / 2 / xyrange
+	zscale        = height * 0.4
+	angle         = math.Pi / 6
+)
+var sin30 = math.Sin(angle) // Go的常量是在编译之前就能确定的常量
+var cos30 = math.Cos(angle)
+
+
+
+func main() {
+	fmt.Printf("<svg xmlns='http://www.w3.org/2000/svg' "+
+        "style='stroke: grey; fill: white; stroke-width: 0.7' "+
+        "width='%d' height='%d'>", width, height)
+	for i:= 0; i < cells; i++ {
+		for j := 0; j < cells; j++ {
+			ax, ay, az := corner(i + 1, j)
+			bx, by, bz := corner(i, j)
+			cx, cy, cz := corner(i, j + 1)
+			dx, dy, dz := corner(i + 1, j + 1)
+			if math.IsNaN(ax) || math.IsNaN(ay) || math.IsNaN(bx) || math.IsNaN(by) || math.IsNaN(cx) || math.IsNaN(cy) || math.IsNaN(dx) || math.IsNaN(dy) {
+				fmt.Fprintf(os.Stderr, "NAN")
+			} else {
+				//将z映射到一个较大范围
+
+				fmt.Printf("<polygon style='fill: ")
+				
+				avgz := int((az + bz + cz + dz) * 10.0 + 8.0) * 18
+				
+				redv, bluev := 0, 0 
+				if avgz <= 255 {
+					redv = 0
+					bluev = 255 - avgz
+				} else {
+					redv = avgz - 255
+					bluev = 0
+				}
+				if redv > 255 {
+					redv = 255
+				}
+				if bluev > 255{
+					bluev = 255
+				}
+				
+				fmt.Printf("#%02X00", redv)
+				fmt.Printf("%02X", bluev)	
+				fmt.Printf("' points='%g,%g %g,%g %g,%g %g,%g'/>\n",ax, ay, bx, by, cx, cy, dx, dy)
+				
+			}
+		}
+	}
+	fmt.Println("</svg>")
+}
+
+func corner(i, j int) (float64, float64, float64) {
+    x := xyrange * (float64(i)/cells - 0.5)
+    y := xyrange * (float64(j)/cells - 0.5)
+
+    z := f(x, y)
+    sx := width/2 + (x-y)*cos30*xyscale
+    sy := height/2 + (x+y)*sin30*xyscale - z*zscale
+    return sx, sy, z
+}
+
+func f(x, y float64) float64 {
+    r := math.Hypot(x, y) 
+    return math.Sin(r) / r
+}
 ```
