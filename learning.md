@@ -1561,3 +1561,140 @@ func diff(z complex128) complex128 {
 
 ### 练习3.8
 - 通过提高精度来生成更多级别的分形。使用四种不同精度类型的数字实现相同的分形：complex64、complex128、big.Float和big.Rat。（后面两种类型在math/big包声明。Float是有指定限精度的浮点数；Rat是无限精度的有理数。）它们间的性能和内存使用对比如何？当渲染图可见时缩放的级别是多少？
+
+### 练习3.9
+- 编写一个web服务器，用于给客户端生成分形的图像。运行客户端通过HTTP参数指定x、y和zoom参数。
+
+```go
+// 实现http传参， 先处理参数再绘制
+
+package main
+
+import (
+	"fmt"
+	"image"
+	"image/color"
+	"image/png"
+	"log"
+	"math/cmplx"
+	"net/http"
+	"strconv"
+)
+
+func main(){
+	const (
+	//	xmin, ymin, xmax, ymax = -2, -2,  2, 2
+		width, height = 1024, 1024
+	)
+	params := map[string] float64 { // 使用map直接存， 要是在之后使用多个if判断， 耗时反而会更久
+		"xmin": -2, 
+		"xmax": 2,
+		"ymin": -2,
+		"ymax": 2,
+		"zoom": 1,
+	}
+
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+			for name := range params {
+				s := r.FormValue(name)
+				if s == "" {
+					continue
+				}
+				f, err := strconv.ParseFloat(s, 64)
+				if err != nil {
+					http.Error(w, fmt.Sprintf("query param %s: %s", name, err), http.StatusBadRequest)
+					return
+				}
+				params[name] = f  // 读取信息的方式， 来自Gopl-homework
+			}
+			if params["xmax"] <= params["xmin"] || params["ymax"] <= params["ymin"] {
+				http.Error(w, fmt.Sprintf("min coordinate greater than max"), http.StatusBadRequest)
+					return 
+			}
+			xmin, xmax, ymin, ymax, zoom := params["xmin"],params["xmax"],params["ymin"],params["ymax"],params["zoom"]
+			lenX, lenY := xmax - xmin, ymax - ymin
+			midX, midY := xmin + lenX / 2, ymin + lenY / 2
+			xmin, xmax, ymin, ymax = midX - lenX / 2 / zoom, midX + lenX / zoom / 2, midY - lenY / 2 / zoom, midY + lenY / 2 / zoom
+			//fmt.Fprintf(os.Stderr, "%g %g %g %g\n", xmin, xmax, ymin, ymax)
+			img := image.NewRGBA(image.Rect(0,0,width, height))
+			for py := 0; py < height; py++ {
+				y := float64(py) / height * (ymax - ymin) + ymin
+				for px := 0; px < width; px++ {
+					x := float64(px) / width * (xmax - xmin) + xmin 
+					z := complex(x, y)
+					img.Set(px, py, mandelbrot(z))
+				}
+			}
+			png.Encode(w, img)
+	})
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+
+}
+
+func mandelbrot(z complex128) color.Color{
+	const iterations = 200
+	const contrast = 15
+	var v complex128 
+	for n := uint8(0); n < iterations; n++ {
+		v = v * v + z
+		if cmplx.Abs(v) > 2 {
+			return color.Gray{255 - contrast * n}
+		}
+	}
+	return color.Black
+}
+```
+
+- Go 同C含有表达式短路机制
+
+## 字符串
+- 首先 Go中的字符串是不允许被修改的
+- 字符串S[i]表示读第i个字节， 并不一定是第i个字符
+- Unicode 编码标准优良， 可以不用解码检查前后缀
+- 在程序内部使用rune序列可以更加方便， 大小一致， 便于切割
+  
+- 书上的示例
+```go
+
+// 三个示例写一个文件里了
+
+// 将看起来像是 系统目录的前缀删除， 并将看起来像后缀名的部分删除
+func basename (s string) string {
+	for i := len(s); i >= 0; i-- {
+		if s[i] == '/' {
+			s = s[i + 1: ]
+			break
+		}
+	}
+	for i := len(s) - 1; i >= 0; i-- {
+		if s[i] == '.' {
+			s = s[:i]
+			break
+		}
+	}
+	return s
+}
+
+// 使用strings.LastIndex 
+func basename1 (s string) string {
+	slash := strings.LastIndex(s, "/")
+	s = s[slash + 1:]
+	if dot := strings.LastIndex(s, "."); dot >= 0 {
+		s = s[:dot]
+	} 
+	return s
+}
+
+// comma 
+
+func comma(s string) string {
+	n := len(s)
+	if n <= 3 {
+		return s
+	}
+	return comma(s[:n - 3] + "," + s[n - 3:])
+}
+
+```
+
+- 
