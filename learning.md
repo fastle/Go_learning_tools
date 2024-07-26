@@ -1697,4 +1697,214 @@ func comma(s string) string {
 
 ```
 
-- 
+### 练习3.10
+-  编写一个非递归版本的comma函数，使用bytes.Buffer代替字符串链接操作。
+
+```go
+// 实现非递归版本的comma函数
+
+package main
+
+import "bytes"
+
+func main(){
+	for _, s := range []string{"1", "12", "123", "1234", "12345678901234", "123456789012345", "1234567890123456", "12345678901234567", "123456789012345678", "1234567890123456789"} {
+		println(comma(s))
+	}
+}
+
+func comma(s string) string {
+	var buf bytes.Buffer
+	len := len(s)
+	mod1 := len % 3
+	if mod1 == 0 && len >= 3 {
+		mod1 = 3
+	}
+	for be := 0; be + mod1 <= len ;{
+		buf.WriteString(s[be:be+mod1])
+		if be + mod1 != len {
+			buf.WriteString(",")
+		}
+		be += mod1
+		mod1 = 3
+	}
+
+	return buf.String()
+}
+```
+
+## 练习3.11
+-  完善comma函数，以支持浮点数处理和一个可选的正负号的处理。
+
+```go
+// 实现非递归版本的comma函数
+
+package main
+
+import (
+	"bytes"
+	"strings"
+)
+
+func main(){
+	for _, s := range []string{"1", "12", "123", "1234", "12345678.901234", "-123456789012.345", "123456789012.3456", "123456789012345.67", "12345678901234567.8", "12.34567890123456789"} {
+		println(comma(s))
+	}
+}
+
+// 更改后的comma 函数支持将浮点数, 小数部分是从左往右
+func comma(s string) string {
+	var buf bytes.Buffer
+	len := len(s)
+	if len > 0 && s[0] == '-' {
+		buf.WriteByte('-')
+		s = s[1:]
+	}
+	dotPlace := strings.IndexByte(s, '.') 
+	if dotPlace > 0 {
+		buf.WriteString(comma1(s[:dotPlace]))
+		buf.WriteByte('.')
+		buf.WriteString(comma2(s[dotPlace + 1:]))
+	} else {
+		buf.WriteString(comma1(s))
+	}
+	return buf.String()
+}
+// 整数部分
+func comma1(s string) string {
+	var buf bytes.Buffer
+	len := len(s)
+	mod1 := len % 3
+	if mod1 == 0 && len >= 3 {
+		mod1 = 3
+	}
+	for be := 0; be + mod1 <= len ;{
+		buf.WriteString(s[be:be+mod1])
+		if be + mod1 != len {
+			buf.WriteString(",")
+		}
+		be += mod1
+		mod1 = 3
+	}
+	return buf.String()
+}
+// 小数部分
+func comma2(s string) string {
+	var buf bytes.Buffer
+	len := len(s)
+	
+	for be := 0; be < len ; be += 3{
+		if be + 3 < len {
+			buf.WriteString(s[be:be+3])
+			buf.WriteString(",")
+		} else {
+			buf.WriteString(s[be:])
+		}
+	}
+	return buf.String()
+}
+```
+
+### 练习3.12
+- 编写一个函数，判断两个字符串是否是相互打乱的，也就是说它们有着相同的字符，但是对应不同的顺序。
+
+```go
+
+// 使用两个map记录两个字符串字符出现次数
+// 
+
+package main
+
+import "fmt"
+
+func main(){
+	s1, s2 := "abc", "cba"
+	fmt.Println(cmp(s1, s2))
+}
+
+func cmp(s1, s2 string) bool {
+	if s1 == s2{
+		return false 
+	}
+	m1, m2 := make(map[string]int), make(map[string]int)
+	for i := 0; i < len(s1); i++ {
+		m1[string(s1[i])]++
+	}
+	for i := 0; i < len(s2); i++ {
+		m2[string(s2[i])]++
+	}
+	for k, v := range m1 {
+		if m2[k] != v {
+			return false
+		}
+	}
+	return true
+}
+```
+
+
+## 常量
+
+### iota 常量生成器
+- iota 常量生成器， 可以在常量声明中用iota作为常量值， 它会自增， 从0开始
+```go
+type Weekday int
+
+const (
+    Sunday Weekday = iota
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+)
+```
+- 常量可以表示为无类型的
+
+### 练习3.13
+- 编写KB、MB的常量声明，然后扩展到YB。
+
+```go
+// 练习3.13 编写KB、MB的常量声明，然后扩展到YB。
+// 拆分二进制
+package main
+
+func main() {
+	const (
+		KB = 1000
+		MB = 1000 * KB
+		GB = 1000 * MB
+		TB = 1000 * GB
+		PB = 1000 * TB
+		EB = 1000 * PB
+		ZB = 1000 * EB
+		YB = 1000 * ZB
+	)
+	//fmt.Println(KB, MB, GB, TB, PB, EB, ZB,YB)
+}
+
+```
+
+
+# 第四章
+
+- 默认情况下，数组的每个元素都被初始化为元素类型对应的0值。
+- 示例
+
+```go
+
+q := [3]int{1, 2, 3}
+
+type Currency int
+const (
+	USD Currency = iota
+	EUR
+	GBP
+	RMB
+)
+symbol := [4]string{USD: "$", EUR: "€", GBP: "£", RMB: "¥"}
+fmt.Println(RMB, symbol[RMB])
+
+
+```

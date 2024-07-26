@@ -33,7 +33,6 @@ func basename1 (s string) string {
 // comma 
 
 // comma 函数用于在字符串的倒数第3位之前插入逗号，以实现英文数字读法的分隔效果。
-// 例如，输入 "12345678"，输出 "1234,5678"。
 // 当字符串长度小于等于3时，不再插入逗号。
 func comma(s string) string {
     // 获取字符串长度
