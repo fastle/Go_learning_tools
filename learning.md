@@ -1987,7 +1987,21 @@ func main() {
 		case 512:
 			fmt.Printf("%x 3\n", sha512.Sum512([]byte(s)))
 		default:
-			fmt.Printf("输入错误")
-	}
+			fmt.Printf("输入错误"u
 }
+```
+
+## Slice
+
+### 共通点
+- 语法相近,slice只是没有固定长度。
+
+### 区别
+- slice的第一个元素不一定是数组的第一个元素。
+- slice的容量是指从slice开始地址到数组结束地址的距离。 使用cap函数可以获取slice的容量。
+- slice的容量和长度可以不一样。多个slice可以指向同一个数组。
+- slice不能直接判断是否相等，但是可以通过比较其长度和元素是否相等来判断。
+- 
+```
+
 ```
