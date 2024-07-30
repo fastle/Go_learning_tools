@@ -2005,3 +2005,370 @@ func main() {
 ```
 
 ```
+
+
+# 第五章
+- 函数的四种写法——你懂么?
+```go
+func add(x int, y int) int {return x + y}
+func sub(x, y int) int {return x - y})
+func first(x int, _ int) int {return x}
+func zero(int, int ) int {return 0}
+
+
+```
+
+- 函数的类型被称为函数的签名， 由两个部分，参数列表和返回值列表决定。
+```go
+func Sin(x float64) float // 该函数没有函数体， 为函数声明，表示功能不是由GO实现的， 定义了函数签名（可能是汇编语言）
+```
+- 遍历dom树的递归函数
+```go
+// 遍历dom树查找herf
+// 遍历dom树查找herf
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin)  // html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	for _, link := range visit(nil, doc) { // 
+		fmt.Println(link)
+	}
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		links = visit(links, c) // 递归调用， 
+	}
+	return links
+}
+
+
+```
+- 输出整个dom树结构，
+
+### 练习5.1
+- 修改findlinks代码中遍历n.FirstChild链表的部分，将循环调用visit，改成递归调用。
+```go
+// 递归子节点和兄弟节点
+
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main(){
+	doc, err := html.Parse(os.Stdin)  
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	for _, link := range visit(nil, doc) { // 
+		fmt.Println(link)
+	}
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	if n.FirstChild != nil {
+		links = visit(links, n.FirstChild)
+	}
+	if n.NextSibling != nil {
+		links = visit(links, n.NextSibling)
+	}
+	return links
+}
+
+
+```
+
+### 练习5.2
+-  编写函数，记录在HTML树中出现的同名元素的次数。
+  
+```go
+// 编写函数，记录在HTML树中出现的同名元素的次数。
+// 同名元素是指 Node.Data 相同的， 使用map统计即可
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin)  // html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	for name, total := range count(make(map[string]int), doc) { // 
+		fmt.Printf("%s, %d\n", name, total)
+	}
+}
+
+func count(m map[string]int, n *html.Node) map[string]int{
+	if n.Type == html.ElementNode{
+		m[n.Data]++
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		count(m, c)
+	}
+	return m
+}
+
+
+```
+
+### 练习5.3
+-  编写函数输出所有text结点的内容。注意不要访问<script>和<style>元素，因为这些元素对浏览者是不可见的。
+  
+```go
+// text节点判断方法—— 为html.text Node, 输出非英文有的是乱码
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin)  // html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	for _, link := range visit(nil, doc) { // 
+		fmt.Println(link)
+	}
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.TextNode  {
+		fmt.Println(n.Data)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		if c.Data == "style" || c.Data == "script" {
+			continue
+		}
+		links = visit(links, c) 
+	}
+	return links
+}
+
+```
+
+### 练习5.4
+-  扩展visit函数，使其能够处理其他类型的结点，如images、scripts和style sheets。
+-  
+```go
+
+// 扩展visit函数，使其能够处理其他类型的结点，如images、scripts和style sheets。
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main(){
+	doc, err := html.Parse(os.Stdin)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	for _, link := range visit(nil, doc) { // 
+		fmt.Println(link)
+	}
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	if n.Type == html.ElementNode && (n.Data == "img" || n.Data == "script") {
+		for _, a := range n.Attr {
+			if a.Key == "src" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		links = visit(links, c) // 递归调用， 
+	}
+	return links
+}
+
+
+```
+
+
+## 多返回值
+- 多返回值可以做返回值
+- 多返回值函数可以做参数， 下面两种写法等同
+
+```go
+log.Println(findLinks(url))
+```
+
+```go
+links, err := findLinks(url)
+log.Println(links, err)
+```
+
+- 新版本findlinks
+
+```go
+// 遍历dom树查找herf
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main(){
+	for _, url := range os.Args[1:] {
+		links, err := findLinks(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "findlinks2: %v\n", err)
+			continue
+		}
+		for _, link := range links {
+			fmt.Println(link)
+		}
+	}
+}
+
+func findLinks(url string) ([]string, error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err 
+	}
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return nil, fmt.Errorf("getting %s: %s", url, resp.Status)
+	}
+	doc, err := html.Parse(resp.Body)
+	resp.Body.Close() // Go的垃圾回收不包括
+	if err != nil {
+		return nil, err
+	}
+	return visit(nil, doc), nil // 返回值有好几种， 
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		links = visit(links, c) // 递归调用， 
+	}
+	return links
+}
+
+
+```
+
+- 如果一个函数的所有返回值都有显示的变量名， 那么该函数的return语句可以省略变量名。 bare return
+
+## 练习5.6
+-  修改gopl.io/ch3/surface（§3.2）中的corner函数，将返回值命名，并使用bare return。
+-  
+
+```go
+func corner(i, j int) (sx float64,sy float64) {
+	x := xyrange * (float64(i) / cells - 0.5)
+	y := xyrange * (float64(j) / cells - 0.5)
+	z := f(x, y)
+	sx = width / 2 + (x - y) * cos30 * xyscale
+	sy = height / 2 + (x + y) * sin30 * xyscale - z * zscale
+	return 
+}
+
+```
+
+## 错误处理
+- 所有错误在本层分层时， 都需要添加本层的前缀， 错误信息
+- 错误一般分为五种
+- 传播错误， 错误会使得整个功能失败。 整个错误返回给调用者
+- 错误时偶然性，不可预知的问题产生。 重试时， 我们需要限制重试的时间间隔或者重试的次数， 避免无限制的重试 （例子：下面的wait函数）
+- 错误时整个程序无法运行、需要输出错误并且结束程序， 只应该在main中执行。 
+- 错误时， 只需要输出错误， 不需要结束程序。  log.printf("message", error)
+- 直接忽略掉错误。
+- 文件结尾错误一般不需要报错
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"time"
+)
+
+func main() {
+
+}
+
+func WaitForServer(url string) error {
+	const timeout = 1 * time.Minute
+	deadline := time.Now().Add(timeout)
+	for tries := 0; time.Now().Before(deadline); tries++ {
+		_, err := http.Head(url)
+		if err == nil {
+			return nil
+		}
+		log.Printf("server not responding (%s); retrying...", err)
+		time.Sleep(time.Second << uint(tries)) 
+	}
+	return fmt.Errorf("server %s failed to respond after %s", url, timeout)
+}
+```
