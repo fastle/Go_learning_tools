@@ -2372,3 +2372,693 @@ func WaitForServer(url string) error {
 	return fmt.Errorf("server %s failed to respond after %s", url, timeout)
 }
 ```
+
+## 函数变量
+- Go语言中，函数也是值， 可以赋值给变量， 函数变量可以作为参数传递给其他函数
+- 例子
+
+```go
+func square(n int) int { return n * n }
+func negative(n int) int { return -n }
+func product(m, n int) int { return m * n }
+f := square
+fmt.Println(f(3))
+f = negative
+fmt.Println(f(3))
+fmt.Printf("%T\n", f))
+f = product // 这里会报错， 因为两种函数不是同一类型（类型由参数列表和返回值列表决定）
+```
+
+- %*s 会在字符串之前填充一些空格，后面写数目
+
+- 利用函数变量重写outline如下
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+var depth int 
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin) 
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	forEachNode(doc, startElement, ElementNode)
+}
+
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	if post != nil {
+		post(n)
+	}
+}
+
+func startElement(n *html.Node) {
+	if n.Type == html.ElementNode {
+		fmt.Printf("%*s<%s>\n", depth * 2, "", n.Data)
+		depth++
+	}
+}
+
+func ElementNode(n *html.Node) {
+	if n.Type == html.ElementNode {
+		depth--
+		fmt.Printf("%*s<%s>\n", depth * 2, "", n.Data)
+	}
+}
+```
+
+
+### 练习5.7
+-  完善startElement和endElement函数，使其成为通用的HTML输出器。要求：输出注释结点，文本结点以及每个元素的属性（< a href='...'>）。使用简略格式输出没有孩子结点的元素（即用<img/>代替<img></img>）。编写测试，验证程序输出的格式正确。（详见11章）
+
+```go
+// 在前括号信息内增加所需信息， 并且通过有无子节点判断是否增添后括号
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+var depth int 
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin) 
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	forEachNode(doc, startElement, ElementNode, leaveNode)
+}
+
+
+func forEachNode(n *html.Node, pre, post, now func(n *html.Node)) {
+	if n.FirstChild == nil {
+		now(n)
+		return 
+	}
+	if pre != nil {
+		pre(n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post, now)
+	}
+	if post != nil && n.FirstChild != nil{
+		post(n)
+	}
+}
+
+func startElement(n *html.Node) {
+	if n.Type == html.ElementNode {
+		fmt.Printf("%*s<%s ", depth * 2, "", n.Data)
+		for _, a := range n.Attr {
+			fmt.Printf("%s=%s ", a.Key, a.Val)
+		}
+		depth++
+		fmt.Printf(">\n")
+	}
+}
+
+func ElementNode(n *html.Node) {
+	if n.Type == html.ElementNode {
+		depth--
+		fmt.Printf("%*s</%s>\n", depth * 2, "", n.Data)
+	}
+}
+
+func leaveNode(n *html.Node) {
+	if n.Type == html.ElementNode {
+		fmt.Printf("%*s<%s/ ", (depth + 1) * 2, "", n.Data)
+		for _, a := range n.Attr {
+			fmt.Printf("%s=%s ", a.Key, a.Val)
+		}
+		fmt.Printf(">\n")
+	}
+}
+```
+
+### 练习5.8
+- 修改pre和post函数，使其返回布尔类型的返回值。返回false时，中止forEachNoded的遍历。使用修改后的代码编写ElementByID函数，根据用户输入的id查找第一个拥有该id元素的HTML元素，查找成功后，停止遍历。
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+var depth int 
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin) 
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	_, ok := ElementByID(doc, "lg", startElement, ElementNode)
+	if !ok {
+		fmt.Println("not found")
+	}
+
+}
+
+func ElementByID(n *html.Node, id string,  pre, post func(n *html.Node,id string) bool) (*html.Node, bool) {
+	if pre != nil {
+	    ok := pre(n, id)
+		if ok {
+			return n, ok
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		ans1, ok := ElementByID(c, id, pre, post)
+		if ok {
+			return ans1, ok
+		}
+	}
+	if post != nil {
+		post(n, id)
+	}
+	return nil, false
+}
+
+
+func startElement(n *html.Node, id string) bool{
+	if n.Type == html.ElementNode {
+		fmt.Printf("%*s<%s>\n", depth * 2, "", n.Data)
+		depth++
+	}
+	for _, a := range n.Attr {
+		if a.Key == "id" && a.Val == id{
+			fmt.Printf("%*s found here\n", (depth + 1) *2, "")
+			return true
+		}
+	}
+	return false
+}
+
+func ElementNode(n *html.Node, id string) bool{
+	if n.Type == html.ElementNode {
+		depth--
+		fmt.Printf("%*s</%s>\n", depth * 2, "", n.Data)
+	}
+	return false
+}
+
+```
+
+### 练习5.9
+- 编写函数expand，将s中的"foo"替换为f("foo")的返回值。
+```go
+// 编写函数expand，将s中的"foo"替换为f("foo")的返回值
+
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+
+	s := "fooofffofofooffooofofofofofo"
+	fmt.Printf("%s\n%s\n", s, expand(s, f))
+}
+
+func expand(s string, f func(string) string) string {
+	newS := f("foo")
+	return strings.Replace(s, "foo", newS, -1)
+}
+
+func f(s string) string {
+	return "?" + s + "?"
+}
+```
+
+## 匿名函数
+- 命名函数只能在包级别进行声明， 匿名函数函数后面没有名称， 能够获取到整个词法环境
+- 示例
+
+```go
+package main
+
+func main() {
+	f := squares()
+	for i := 0; i < 10; i++ {
+		println(f())
+	}
+}
+
+func squares() func() int {
+	var x int
+	return func() int {
+		x++
+		return x * x
+	}
+}
+```
+- 拓扑排序
+
+```go
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+var prereqs = map[string][]string{
+	"algorithms": {"data structures"},
+	"calculus":   {"linear algebra"},
+	"compilers": {
+		"data structures",
+		"formal languages",
+		"computer organization",
+	},
+	"data structures":       {"discrete math"},
+	"databases":             {"data structures"},
+	"discrete math":         {"intro to programming"},
+	"formal languages":      {"discrete math"},
+	"networks":              {"operating systems"},
+	"operating systems":     {"data structures", "computer organization"},
+	"programming languages": {"data structures", "computer organization"},
+}
+
+func main() {
+	for i, course := range topoSort(prereqs) {
+		fmt.Printf("%d:\t%s\n", i+1, course)
+	}
+}
+
+// topoSort 实现了对有向无环图（DAG）的节点进行拓扑排序。
+// m 是一个映射，其中每个键代表图中的一个节点，对应的值是该节点指向的其他节点的列表。
+// 返回值是节点的拓扑排序列表。
+func topoSort(m map[string][]string) []string {
+    // order 用于存储拓扑排序的结果。
+    var order []string
+    // seen 用于记录已经访问过的节点，以避免重复访问。
+    seen := make(map[string]bool)
+
+    // visitAll 是一个递归函数，用于遍历节点并将其按拓扑顺序添加到 order 中。
+    var visitAll func(items []string)
+    visitAll = func(items []string) {
+        for _, item := range items {
+            // 如果节点尚未被访问，则递归访问其依赖项，并将该节点添加到排序顺序中。
+            if !seen[item] {
+                seen[item] = true
+                visitAll(m[item])
+                order = append(order, item)
+            }
+        }
+    }
+
+    // keys 用于存储 m 中所有键（节点）的列表，以便进行排序。
+    var keys []string
+    for key := range m {
+        keys = append(keys, key)
+    }
+
+    // 对节点进行排序，以便按照一定的顺序访问它们。
+    sort.Strings(keys)
+
+    // 使用排序后的节点列表调用 visitAll，以确保节点的处理顺序符合排序结果。
+    visitAll(keys)  // 这里是访问入口， 从这里开始拓扑排序
+
+    // 返回拓扑排序结果。
+    return order
+}
+```
+
+### 练习5.10
+- 重写topoSort函数，用map代替切片并移除对key的排序代码。验证结果的正确性（结果不唯一）。
+
+```go
+// 重写topoSort函数，用map代替切片并移除对key的排序代码。验证结果的正确性（结果不唯一）。
+
+package main
+
+import (
+	"fmt"
+)
+
+var prereqs = map[string][]string{
+	"algorithms": {"data structures"},
+	"calculus":   {"linear algebra"},
+	"compilers": {
+		"data structures",
+		"formal languages",
+		"computer organization",
+	},
+	"data structures":       {"discrete math"},
+	"databases":             {"data structures"},
+	"discrete math":         {"intro to programming"},
+	"formal languages":      {"discrete math"},
+	"networks":              {"operating systems"},
+	"operating systems":     {"data structures", "computer organization"},
+	"programming languages": {"data structures", "computer organization"},
+}
+
+func main() {
+	for i, course := range topoSort(prereqs) {
+		fmt.Printf("%d:\t%s\n", i+1, course)
+	}
+}
+func topoSort(m map[string][]string) []string {
+    var order []string
+    seen := make(map[string]bool)
+
+    var visitAll func(m map[string][]string, s string)
+    visitAll = func(m map[string][]string, s string) {
+		if seen[s] {  // 多入口， 把判断改到循环开始
+			return
+		}
+		seen[s] = true
+		order = append(order, s)
+		items := m[s]
+        for _, item := range items {
+			//fmt.Println(s + "!" + item + "!")
+            visitAll(m , item)
+        }
+    }
+    for key := range m {
+		visitAll(m, key)
+    }
+    return order
+}
+
+```
+### 练习5.11
+- 现在线性代数的老师把微积分设为了前置课程。完善topSort，使其能检测有向图中的环。
+
+```go
+// 使用带度数的拓扑排序，最后要是有度数不为零的，就是环上的。
+
+package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+var prereqs = map[string][]string{
+	"algorithms": {"data structures"},
+	"calculus":   {"linear algebra"},
+	"compilers": {
+		"data structures",
+		"formal languages",
+		"computer organization",
+	},
+	"data structures":       {"discrete math"},
+	"databases":             {"data structures"},
+	"discrete math":         {"intro to programming"},
+	"formal languages":      {"discrete math"},
+	"networks":              {"operating systems"},
+	"operating systems":     {"data structures", "computer organization"},
+	"programming languages": {"data structures", "computer organization"},
+}
+
+func main() {
+	for i, course := range topoSort(prereqs) {
+		fmt.Printf("%d:\t%s\n", i+1, course)
+	}
+}
+func topoSort(m map[string][]string) []string {
+	du := make(map[string]int)
+	for _, v := range m {
+		for _, tmp := range v{
+			du[tmp] ++
+		}
+	}
+
+    var order []string
+    var visitAll func(now string)
+    visitAll = func(now string) {
+		order = append(order, now)
+        items := m[now]
+		for _, item := range items{
+            du[item] --
+            if du[item] == 0 {
+			//	fmt.Println("?")
+				visitAll(item)
+			}
+        }
+    }
+    var keys []string
+    for key := range m {
+        if du[key] == 0 {
+			keys = append(keys, key)
+		//	fmt.Println(key + "!")
+		}
+    }
+    sort.Strings(keys)
+    for _, key := range keys {
+        visitAll(key)
+    }
+	for _, v := range du {
+		if v != 0 {
+			panic("有环")
+		}
+	}
+    return order
+}
+```
+
+### 练习5.12
+- gopl.io/ch5/outline2（5.5节）的startElement和endElement共用了全局变量depth，将它们修改为匿名函数，使其共享outline中的局部变量。
+
+```go
+
+// 将outline2 中的startElement和endElement改成匿名函数
+
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"golang.org/x/net/html"
+)
+func main(){
+	//fmt.Println(fetch())
+	doc, err := html.Parse(os.Stdin) 
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "findlink: %v\n", err)
+		os.Exit(1)
+	}
+	var depth int
+	forEachNode(doc, func(n *html.Node){
+		if n.Type == html.ElementNode {
+			fmt.Printf("%*s<%s>\n", depth * 2, "", n.Data)
+			depth++
+		}
+	}, func(n *html.Node){
+		if n.Type == html.ElementNode {
+			depth--
+			fmt.Printf("%*s</%s>\n", depth * 2, "", n.Data)
+		}
+	})
+}
+
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	if post != nil {
+		post(n)
+	}
+}
+
+```
+
+### 练习5.13
+- 修改crawl，使其能保存发现的页面，必要时，可以创建目录来保存这些页面。只保存来自原始域名下的页面。假设初始页面在golang.org下，就不要保存vimeo.com下的页面。
+- 暂时略过
+
+### 练习5.14
+- 使用breadthFirst遍历其他数据结构。比如，topoSort例子中的课程依赖关系（有向图）、个人计算机的文件层次结构（树）；你所在城市的公交或地铁线路（无向图）。
+- 暂时略过
+
+- 作用域问题， 由于匿名函数使用的变量常常是传址
+
+
+## 可变参数
+- 在声明可变参数函数时， 需要在参数列表的最后一个参数类型前面加上省略号...
+- 例子
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(sum(1, 2, 3, 4, 5))
+	fmt.Println(sum())
+	fmt.Println(sum(1))
+}
+
+func sum(vals ...int) int {
+	total := 0
+	for _, val := range vals {
+		total += val
+	}
+	return total
+}
+```
+
+### 练习5.15
+-  编写类似sum的可变参数函数max和min。考虑不传参时，max和min该如何处理，再编写至少接收1个参数的版本。
+```go
+// 编写类似sum的可变参数函数max和min。考虑不传参时，max和min该如何处理，再编写至少接收1个参数的版本。
+package main
+
+import "fmt"
+
+
+func main(){
+	fmt.Println(max(1,2,3,4,5,6,7,8,9,10))
+	fmt.Println(min())
+}
+
+func max(x ...int) int {
+	if len(x) == 0 {
+		return 0
+	}
+	max := x[0]
+	for _, v := range x {
+		if v > max {
+			max = v
+		}
+	}
+	return max
+}
+
+func min(x ...int) int {
+	if len(x) == 0 {
+		return 0
+	}
+	min := x[0]
+	for _, v := range x {
+		if v < min {
+			min = v
+		}
+	}
+	return min
+}
+
+```
+
+### 练习5.16
+- 编写多参数版本的strings.Join。
+
+```go
+// 将 多个字符串数组拼接成一个字符串
+package main
+
+import (
+	"fmt"
+)
+func main() {
+	strs := []string{"a", "b", "c"}
+	strs2 := []string{"d", "e", "f"}
+	fmt.Println(myJoin(","))
+	fmt.Println(myJoin("?", strs))
+	fmt.Println(myJoin("?", strs, strs))
+	fmt.Println(myJoin("?", strs, strs2, strs))
+
+}
+
+func myJoin(s string, elems ...[]string) string {
+	if len(elems) == 0 {
+		return ""
+	}
+	var str string
+	for _, elem := range elems {
+		for _, e := range elem {
+			str += e + s
+		}
+	}
+	return str[:len(str)-len(s)]
+}
+```
+
+### 练习5.17
+- 编写多参数版本的ElementsByTagName，函数接收一个HTML结点树以及任意数量的标签名，返回与这些标签名匹配的所有元素。下面给出了2个例子：
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		resp, err := http.Get(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			continue
+		}
+		if resp.StatusCode != http.StatusOK {
+			resp.Body.Close()
+			fmt.Fprintf(os.Stderr, "fetch: %s: %v\n", url, resp.Status)
+			continue 
+		}
+		doc, err := html.Parse(resp.Body)
+		resp.Body.Close() 
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: parsing %s: %v\n", url, err)
+			continue
+		}
+		images := ElementsByTagName(doc, "img")
+		headings := ElementsByTagName(doc, "h1", "h2", "h3", "h4")
+		fmt.Println(images)
+		fmt.Println(headings)
+	}
+}
+
+func ElementsByTagName(doc *html.Node, name ...string) []*html.Node {
+	return visit(nil, doc, name)
+}
+
+func visit(links []*html.Node, n *html.Node, v []string) []*html.Node{
+	if n.Type == html.ElementNode {
+		for _, a := range v {
+			if n.Data == a {
+				links = append(links,  n)
+				return links
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		links = visit(links, c, v) // 递归调用， 
+	}
+	return links
+}
+
+```
+
+
