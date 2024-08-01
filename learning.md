@@ -2152,7 +2152,7 @@ func count(m map[string]int, n *html.Node) map[string]int{
 ```
 
 ### 练习5.3
--  编写函数输出所有text结点的内容。注意不要访问<script>和<style>元素，因为这些元素对浏览者是不可见的。
+-  编写函数输出所有text结点的内容。注意不要访问`<script>`和`<style>`元素，因为这些元素对浏览者是不可见的。
   
 ```go
 // text节点判断方法—— 为html.text Node, 输出非英文有的是乱码
@@ -3061,4 +3061,754 @@ func visit(links []*html.Node, n *html.Node, v []string) []*html.Node{
 
 ```
 
+## Deffered 函数
+- 一般判断出错的方法如下
+```go
+package main
 
+import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"golang.org/x/net/html"
+)
+
+func main() {
+
+}
+func title(url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	// Check Content-Type is HTML (e.g., "text/html;charset=utf-8").
+	ct := resp.Header.Get("Content-Type")
+	if ct != "text/html" && !strings.HasPrefix(ct, "text/html;") { 
+		resp.Body.Close() // 多次调用关闭， 确保各种情况都会正常退出， 但是很麻烦
+		return fmt.Errorf("%s has type %s, not text/html", url, ct)
+	}
+	doc, err := html.Parse(resp.Body)
+	resp.Body.Close()
+	if err != nil {
+		return fmt.Errorf("parsing %s as HTML: %v", url, err)
+	}
+	visitNode := func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" && n.FirstChild != nil {
+			fmt.Println(n.FirstChild.Data)
+		}
+	}
+	forEachNode(doc, visitNode, nil)
+	return nil
+}
+
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	if post != nil {
+		post(n)
+	}
+}
+
+```
+- 可以使用defer函数， 在调用普通函数或者方法的前面加上defer ， 当执行到该条语句时， 函数和参数表达式得到计算， 但函数并不执行。当函数返回时， 函数和参数表达式被执行。
+- 执行顺序和声明顺序相反
+- 在一些复杂的情况下， 可以使用defer函数， 确保函数在程序退出时执行。
+- 示例
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"golang.org/x/net/html"
+)
+
+func main() {
+
+}
+func title(url string) error {
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close() // 
+	ct := resp.Header.Get("Content-Type")
+	if ct != "text/html" && !strings.HasPrefix(ct, "text/html;") { 
+		return fmt.Errorf("%s has type %s, not text/html", url, ct)
+	}
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		return fmt.Errorf("parsing %s as HTML: %v", url, err)
+	}
+	visitNode := func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" && n.FirstChild != nil {
+			fmt.Println(n.FirstChild.Data)
+		}
+	}
+	forEachNode(doc, visitNode, nil)
+	return nil
+}
+
+
+func forEachNode(n *html.Node, pre, post func(n *html.Node)) {
+	if pre != nil {
+		pre(n)
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	if post != nil {
+		post(n)
+	}
+}
+
+```
+
+- defer 也可以用来记录何时进入和退出函数
+
+```go
+package main
+
+import (
+	"log"
+	"time"
+)
+
+func main() {
+	bigSlowOperation()
+}
+
+func bigSlowOperation() {
+	defer trace("bigSlowOperation")() // 如果不加括号的的话， 则表示在退出时调用trace
+
+	time.Sleep(10 * time.Second)
+}
+
+func trace(msg string) func() {
+	start := time.Now()
+	log.Printf("enter %s", msg)
+	return func() {
+		log.Printf("exit %s (%s)", msg, time.Since(start))
+	}
+}
+```
+- 注意defer函数是在函数结束后才执行， 而不是其他代码域
+- 使用defer 改进fetch ， 将http相应信息写入本地文件而不是标准输出流 
+```go
+
+// fetch 改进版 将http相应信息写入本地文件而不是标准输出流
+
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path"
+)
+// 
+func main() {
+	for _, url := range os.Args[1:] {
+		local, n, err := fetch(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			return 
+		}
+		fmt.Printf("%s %s %d\n", url, local, n)
+	}
+}
+
+func fetch(url string) (filename string, n int64, err error) {
+	resp, err := http.Get(url)
+    if err != nil {
+        return "", 0, err
+    }
+    defer resp.Body.Close() // 延迟关闭
+    local := path.Base(resp.Request.URL.Path)
+    if local == "/" {
+        local = "index.html"
+    }
+    f, err := os.Create(local)
+    if err != nil {
+        return "", 0, err
+    }
+    n, err = io.Copy(f, resp.Body)
+    if closeErr := f.Close(); err == nil {
+        err = closeErr
+    }
+    return local, n, err
+}
+```
+
+
+### 练习5.18
+- 不修改fetch的行为，重写fetch函数，要求使用defer机制关闭文件。
+
+```go
+//  不修改fetch的行为，重写fetch函数，要求使用defer机制关闭文件。
+
+package main
+
+import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"path"
+)
+
+func main() {
+	for _, url := range os.Args[1:] {
+		local, n, err := fetch(url)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "fetch: %v\n", err)
+			return 
+		}
+		fmt.Printf("%s %s %d\n", url, local, n)
+	}
+}
+
+func fetch(url string) (filename string, n int64, err error) {
+	resp, err := http.Get(url)
+    if err != nil {
+        return "", 0, err
+    }
+    defer resp.Body.Close() // 延迟关闭
+    local := path.Base(resp.Request.URL.Path)
+    if local == "/" {
+        local = "index.html"
+    }
+    f, err := os.Create(local)
+    if err != nil {
+        return "", 0, err
+    }
+    n, err = io.Copy(f, resp.Body)
+	defer func() {   // defer 执行顺序在return 之后， 但是在返回值赋值给调用方之前
+		// 为什么defer能调用返回值，因为这里返回值是有名的， defer 函数只能访问有名返回值
+		if closeErr := f.Close(); err == nil {
+			err = closeErr
+		} 
+	}()
+    return local, n, err
+}
+```
+
+## panic 异常 （宕机）
+- 一般来说， panic异常是只能在运行时才能检查到的错误， 比如说数组访问越界， 空指针引用， 当panic发生时， 程序中断运行， 并立即执行在goroutine中被延迟的函数， 然后崩溃输出日志信息
+-  一般来说， 不应用 panic 检查哪些运行时会检查的信息。而且只有比较严重的错误才应用panic
+-  为了方便诊断问题，runtime包允许程序员输出堆栈信息。在下面的例子中，我们通过在main函数中延迟调用printStack输出堆栈信息。
+-  
+- regexp.MustCompile 可以用来检查输入的合法性
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"runtime"
+)
+
+func main() {
+    defer printStack()
+    f(3)
+}
+func printStack() {
+    var buf [4096]byte
+    n := runtime.Stack(buf[:], false)
+    os.Stdout.Write(buf[:n])
+}
+func f(x int) {
+	fmt.Printf("f(%d)\n", x+0/x) 
+	defer fmt.Printf("defer %d\n", x)
+	f(x - 1)
+}
+/*
+输出第一部分
+f(3)
+f(2)
+f(1)
+defer 1
+defer 2
+defer 3  // 发生异常、 之前延迟的defer先被调用， 然后再触发panic
+panic: runtime error: integer divide by zero
+
+
+printStack() 的输出为
+goroutine 1 [running]:
+main.printStack()
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:15 +0x2e
+panic({0xb27a80?, 0xbcb9f0?})
+        C:/Program Files/Go/src/runtime/panic.go:770 +0x132
+main.f(0xb5b098?)
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:19 +0x118
+main.f(0x1)
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:21 +0xfe
+main.f(0x2)
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:21 +0xfe
+main.f(0x3)
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:21 +0xfe
+main.main()
+        D:/bq/Go_learning_tools/learning/defer2/defer2.go:11 +0x35
+*/
+```
+
+## Recover 捕获异常
+- recover 函数用来捕获panic异常， 如果没有panic异常， recover返回nil， 如果有panic异常， recover返回panic的值， 并且恢复panic， 恢复后程序继续运行
+- recover函数只能在defer函数中调用， 否则会panic
+
+### 练习5.19
+- 使用panic和recover编写一个不包含return语句但能返回一个非零值的函数。
+
+```go
+// 练习5.19   使用panic和recover编写一个不包含return语句但能返回一个非零值的函数。
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println(f())
+}
+
+func f() (res int) {
+	defer func() {
+		if err := recover(); err != nil {
+			res = 1
+		}
+	}()
+	panic("panic")
+}
+```
+
+# 第六章 方法
+- 在函数声明时， 在其名字前面放上一个变量， 就是一个方法， 这个附加的参数会将该函数附加到这种类型上，相当于我们对于这种类型建立了一种独立的方法。
+
+
+```go
+// 建立方法样例
+
+package geometry
+
+import "math"
+
+type Point struct {X, Y float64}
+
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X - p.X, q.Y - p.Y)
+}
+
+func (p Point) Distance(q Point) float64 { // p 是方法的接收器
+	return math.Hypot(q.X - p.X, q.Y - p.Y)
+}
+```
+- 可以让代码更简洁
+
+## 嵌入结构体扩展类型
+- 看下面例子
+```go
+type Point struct{ X, Y float64 }
+
+type ColoredPoint struct {
+    Point
+    Color color.RGBA
+}
+```
+- 则可以直接访问 ColoredPoint.X
+- 其逻辑是先从第一层取找元素或者方法， 如果没有就去第二层找， 以此类推, 如果同一层有冲突， 报错
+- 注意， 这种关系并不是继承， 不是 ColorPoint is a Point, 而是 ColorPoint has a Point
+
+- 同时， 我们可以将方法绑定到方法变量上， 写法及示例如下。
+```go
+type Point struct (X, Y float64)
+func (p Point) Add(q Point) Point {return Point{p.X + q.X, p.Y + q.Y}}
+func (p Point) Sub(q Point) Point {return Point{p.X - q.X, p.Y - q.Y}}
+type Path []Point
+func (path Path) TranslateBy(offset Point) {
+	var op func(p, q Point) Point
+	if add {
+		op = Point.Add
+	} else {
+		op = Point.Sub  // 这里可以赋予不同的值， 来使得后面的代码简略
+	}
+	for i := range path {
+		path[i] = op.(path[i], offset)	
+	}
+}
+```
+
+## 示例， bit数组
+
+```go
+// intset
+package main
+
+import (
+	"bytes"
+	"fmt"
+)
+
+type IntSet struct {
+	words []uint64 
+}
+
+func  (s *IntSet) Has(x int) bool {
+	word, bit := x / 64, uint(x % 64)
+	return word < len(s.words) && s.words[word] & (1 << bit) != 0 
+}
+
+// 按位或
+func (s *IntSet) Add(x int) {
+	word, bit := x / 64, uint(x % 64)
+	for word >= len(s.words) {
+		s.words = append(s.words, 0)
+	}
+	s.words[word] |= 1 << bit
+}
+
+// 合并
+func (s *IntSet) UnionWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] |= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+func (s *IntSet) String() string {
+	var buf bytes.Buffer 
+	buf.WriteByte('{')
+	for i, word := range s.words {
+		if word == 0 {
+			continue
+		}
+		for j := 0; j < 64; j++ {
+			if word & (1 << uint(j)) != 0 {
+				if buf.Len() > len("{") {
+					buf.WriteByte(' ')
+				}
+				fmt.Fprintf(&buf, "%d", 64 * i + j)
+			}
+		}
+	}
+	buf.WriteByte('}')
+	return buf.String()
+}
+
+func main(){
+	var x, y IntSet 
+	x.Add(1)
+	x.Add(144)
+	x.Add(9)
+	fmt.Println(x.String()) // "{1 9 144}"
+	y.Add(9)
+	y.Add(42)
+	fmt.Println(y.String()) // "{9 42}"
+	x.UnionWith(&y)
+	fmt.Println(x.String()) // "{1 9 42144}")
+}
+```
+
+
+### 练习6.1
+- 为bit数组实现下面这些方法
+
+```go
+func (*IntSet) Len() int      // return the number of elements
+func (*IntSet) Remove(x int)  // remove x from the set
+func (*IntSet) Clear()        // remove all elements from the set
+func (*IntSet) Copy() *IntSet // return a copy of the set
+```
+
+```go
+// intset
+package main
+
+import (
+	"bytes"
+	"fmt"
+)
+
+type IntSet struct {
+	words []uint64 
+}
+
+func  (s *IntSet) Has(x int) bool {
+	word, bit := x / 64, uint(x % 64)
+	return word < len(s.words) && s.words[word] & (1 << bit) != 0 
+}
+
+// 按位或
+func (s *IntSet) Add(x int) {
+	word, bit := x / 64, uint(x % 64)
+	for word >= len(s.words) {
+		s.words = append(s.words, 0)
+	}
+	s.words[word] |= 1 << bit // 
+}
+
+// 合并
+func (s *IntSet) UnionWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] |= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+func (s *IntSet) String() string {
+	var buf bytes.Buffer 
+	buf.WriteByte('{')
+	for i, word := range s.words {
+		if word == 0 {
+			continue
+		}
+		for j := 0; j < 64; j++ {
+			if word & (1 << uint(j)) != 0 {
+				if buf.Len() > len("{") {
+					buf.WriteByte(' ')
+				}
+				fmt.Fprintf(&buf, "%d", 64 * i + j)
+			}
+		}
+	}
+	buf.WriteByte('}')
+	return buf.String()
+}
+
+func (s *IntSet) Len() int {     // return the number of elements
+	ans := 0
+	for _, e := range s.words {
+		for e != 0 {
+			ans ++
+			e &= e - 1
+		}
+	}
+	return ans 
+}
+func (s *IntSet) Remove(x int) { // remove x from the set
+	word, bit := x / 64, uint(x % 64)
+	bit = ^bit // Go 中取反的写法
+	s.words[word] |= 1 << bit // 
+
+}
+func (s *IntSet) Clear() {       // remove all elements from the set
+	s.words = nil
+}
+func (s *IntSet) Copy() *IntSet {// return a copy of the set
+	ans := new(IntSet)
+	for _, e := range s.words {
+		ans.words = append(ans.words, e)
+	}
+	return ans
+}
+func main(){
+	var x, y IntSet 
+	x.Add(1)
+	x.Add(144)
+	x.Add(9)
+	fmt.Println(x.String()) // "{1 9 144}"
+	y.Add(9)
+	y.Add(42)
+	fmt.Println(y.String()) // "{9 42}"
+	x.UnionWith(&y)
+	fmt.Println(x.String()) // "{1 9 42144}")
+}
+
+```
+
+### 练习6.2
+- 定义一个变参方法(*IntSet).AddAll(...int)，这个方法可以添加一组IntSet，比如s.AddAll(1,2,3)。
+```go
+func (s *IntSet) AddAll(x ...int) {
+	for _, v := range x {
+		s.Add(v)
+	}
+}
+
+```
+
+### 练习6.3 
+- (*IntSet).UnionWith会用|操作符计算两个集合的并集，我们再为IntSet实现另外的几个函数IntersectWith（交集：元素在A集合B集合均出现），DifferenceWith（差集：元素出现在A集合，未出现在B集合），SymmetricDifference（并差集：元素出现在A但没有出现在B，或者出现在B没有出现在A）。
+
+```go
+func (s *IntSet) IntersectWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] &= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+func (s *IntSet) DifferenceWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] &= ^tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+func (s *IntSet) SymmetricDifference(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] ^= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+```
+
+### 练习6.4
+-  实现一个Elems方法，返回集合中的所有元素，用于做一些range之类的遍历操作。
+
+```go
+func (s *IntSet) Elems() []int {
+	var ans []int
+	for i, word := range s.words {
+		if word == 0 {
+			continue
+		}
+		for j := 0; j < 64; j++ {
+			if word & (1 << uint(j)) != 0 {
+				ans = append(ans, 64 * i + j) 
+			}
+		}
+	}
+	return ans 
+}
+
+```
+
+### 练习6.5
+- 我们这章定义的IntSet里的每个字都是用的uint64类型，但是64位的数值可能在32位的平台上不高效。修改程序，使其使用uint类型，这种类型对于32位平台来说更合适。当然了，这里我们可以不用简单粗暴地除64，可以定义一个常量来决定是用32还是64，这里你可能会用到平台的自动判断的一个智能表达式：32 << (^uint(0) >> 63)
+
+```go
+// 根据机器型号， 来进行操作, 直接把字长设置成wordSize = 32 << (^uint(0) >> 32 & 1)
+package main
+
+import (
+	"bytes"
+	"fmt"
+)
+
+const (
+	wordSize = 32 << (^uint(0) >> 32 & 1)
+)
+
+type IntSet struct {
+	words []uint64 
+}
+
+func  (s *IntSet) Has(x int) bool {
+	word, bit := x / wordSize, uint(x % wordSize)
+	return word < len(s.words) && s.words[word] & (1 << bit) != 0 
+}
+
+// 按位或
+func (s *IntSet) Add(x int) {
+	word, bit := x / wordSize, uint(x % wordSize)
+	for word >= len(s.words) {
+		s.words = append(s.words, 0)
+	}
+	s.words[word] |= 1 << bit
+}
+
+// 合并
+func (s *IntSet) UnionWith(t *IntSet) {
+	for i, tword := range t.words {
+		if i < len(s.words) {
+			s.words[i] |= tword
+		} else {
+			s.words = append(s.words, tword)
+		}
+	}
+}
+
+func (s *IntSet) String() string {
+	var buf bytes.Buffer 
+	buf.WriteByte('{')
+	for i, word := range s.words {
+		if word == 0 {
+			continue
+		}
+		for j := 0; j < wordSize; j++ {
+			if word & (1 << uint(j)) != 0 {
+				if buf.Len() > len("{") {
+					buf.WriteByte(' ')
+				}
+				fmt.Fprintf(&buf, "%d", wordSize * i + j)
+			}
+		}
+	}
+	buf.WriteByte('}')
+	return buf.String()
+}
+
+func main(){
+	var x, y IntSet 
+	x.Add(1)
+	x.Add(144)
+	x.Add(9)
+	fmt.Println(x.String()) // "{1 9 144}"
+	y.Add(9)
+	y.Add(42)
+	fmt.Println(y.String()) // "{9 42}"
+	x.UnionWith(&y)
+	fmt.Println(x.String()) // "{1 9 42144}")
+}
+```
+- 一个对象的变量或者方法对于调用方是不可见的话， 一般就被定义为封装， 封装有时候也被叫做数据隐藏，
+- Go 只有一种控制可见性的方法， 大写首字母的标识符会被定义他们的包导出， 小写字母的则不会被导出。
+- 同时适用于struct 或者一个类型的方法
+
+# 第七章 接口
+- 接口类型是对其他类型行为的概括和抽象， 通过使用接口， 我们可以写出更加灵活和通用的函数
+- 接口类型不会暴露出他所代表的对象的内部值的结构， 只会暴露出自己的方法， 也就是你并不知道他是怎么做的，只知道他是做什么的
+
+### 练习7.1
+-  使用来自ByteCounter的思路，实现一个针对单词和行数的计数器。你会发现bufio.ScanWords非常的有用。
+-  
+```go
+
+type WordCounter int
+type LineCounter int
+
+func (c *WordCounter) Write(p []byte) (int, error) {
+	var sc = bufio.NewScanner(bytes.NewReader(p))
+	sc.Split(bufio.ScanWords)
+	for sc.Scan() {
+		*c++
+	}
+	return int(*c), nil
+}
+
+func (c *LineCounter) Write(p []byte) (int, error) {
+	var sc = bufio.NewScanner(bytes.NewReader(p))
+	sc.Split(bufio.ScanLines)
+	for sc.Scan() {
+		*c++
+	}
+	return int(*c), nil
+}
+
+```
+
+### 练习7.2 
+-  写一个带有如下函数签名的函数CountingWriter，传入一个io.Writer接口类型，返回一个把原来的Writer封装在里面的新的Writer类型和一个表示新的写入字节数的int64类型指针。
+-  

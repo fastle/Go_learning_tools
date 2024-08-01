@@ -1,0 +1,3384 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>GO&quest; GO&excl;</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex/dist/katex.min.css">
+<link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="go-go">GO? GO!</h1>
+<ul>
+<li>使用书籍  Go程序设计语言</li>
+</ul>
+<h1 id="第一章">第一章</h1>
+<h2 id="经典helloworld">经典helloworld</h2>
+<ul>
+<li></li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main <span class="hljs-comment">// 该声明为声明自己所属在哪个包， 而不是引用， 声明为main的为一个独立的可执行程序</span>
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span> <span class="hljs-comment">//导入声明</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{ <span class="hljs-comment">//程序入口  go语言换行敏感</span>
+    <span class="hljs-comment">// first program</span>
+    fmt.Println(<span class="hljs-string">&quot;Hello,World&quot;</span>)
+    
+}
+
+
+
+</code></pre>
+<ul>
+<li>gofmt, 自带的格式整理，vscode配置为保存后自动运行， 但是建议直接按照要求来写</li>
+</ul>
+<h2 id="命令行参数">命令行参数</h2>
+<ul>
+<li>os.Args, 返回是一个字符串slice s, s[0] 为命令本身</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 实现将参数输出出来</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">var</span> s, sep <span class="hljs-type">string</span> <span class="hljs-comment">// 变量生成时会被初始化为空值</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt; <span class="hljs-built_in">len</span>(os.Args); i++ { <span class="hljs-comment">// for initialization; condition; post {</span>
+		s += sep + os.Args[i]
+		sep = <span class="hljs-string">&quot; &quot;</span>
+	}
+	fmt.Println(s)
+}
+ 
+</code></pre>
+<h2 id="声明方式">声明方式</h2>
+<ol>
+<li>短变量声明， <code>s := &quot;&quot;</code>, 用来表示初始化比较重要， 但是通常在一个函数内部使用，不适合包级别的变量。</li>
+<li>隐式初始化， <code>var s string</code>， 用来表示初始化不甚重要</li>
+<li>空标识符， <code>_, arg := range os.Args[1:]</code>, 当返回参数中有我们不需要的值时， 应该用空标识符下划线代替， go中不允许存在未使用的变量</li>
+</ol>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	s, sep := <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">&quot; &quot;</span>
+	<span class="hljs-keyword">for</span> _, arg := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {  <span class="hljs-comment">// 空标识符</span>
+		s += sep + arg
+		sep = <span class="hljs-string">&quot; &quot;</span>
+	}
+	fmt.Println(s)
+}
+</code></pre>
+<ul>
+<li>strings.Join(slice, string) 以string链接各元素</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 练习1.1</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	fmt.Println(os.Args[<span class="hljs-number">0</span>])
+}
+
+</code></pre>
+<pre><code class="language-go"><span class="hljs-comment">// 练习1.2</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> idx, s := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		fmt.Println(idx, s)
+	}
+}
+</code></pre>
+<pre><code class="language-go"><span class="hljs-comment">// 练习1.3 暂时不会</span>
+</code></pre>
+<h2 id="基本逻辑工作">基本逻辑工作</h2>
+<pre><code class="language-go"><span class="hljs-comment">// 输出标准输入中出现次数大于1的行，并统计次数</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;bufio&quot;</span> <span class="hljs-comment">// 处理输入输出， Scanner 可以读取输入，以行或者单词为单位断开， 处理以行为单位的输入内容的最简单方式， </span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	counts := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>) <span class="hljs-comment">// map 将string 映射到int ， 值得注意的是， 打印map的打印结果分布是随机的，设计目的是防止程序依赖某种特殊的序列, make 是map内置的函数，多种用途</span>
+	input := bufio.NewScanner(os.Stdin)
+	<span class="hljs-keyword">for</span> input.Scan() {
+		counts[input.Text()]++
+	}
+	<span class="hljs-keyword">for</span> line, n := <span class="hljs-keyword">range</span> counts {
+		<span class="hljs-keyword">if</span> n &gt; <span class="hljs-number">1</span> {
+			fmt.Printf(<span class="hljs-string">&quot;%d\t%s\n&quot;</span>, n, line)
+		}
+	}
+}
+
+</code></pre>
+<ul>
+<li>转义字符，Go语言一般称之为verb 比较不同的是%t bool型， %q 带引号字符串， %v 内置格式的任何值， %T 任何值的类型</li>
+</ul>
+<h2 id="从文件读入">从文件读入</h2>
+<pre><code class="language-go">
+<span class="hljs-comment">// 打印输入中出现多次的行的个数和文本</span>
+<span class="hljs-comment">// 可以支持文件列表读入或者stdin读入</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;bufio&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	counts := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)
+	files := os.Args[<span class="hljs-number">1</span>:]
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(files) == <span class="hljs-number">0</span>{
+		countLines(os.Stdin, counts)
+	} <span class="hljs-keyword">else</span> {
+		<span class="hljs-keyword">for</span> _, arg := <span class="hljs-keyword">range</span> files {
+			f, err := os.Open(arg)  <span class="hljs-comment">//返回两个值, 一个是 *os.File 另一个是err, nil 是内置的表示没有err</span>
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;dup2: %v\n&quot;</span>, err)
+				<span class="hljs-keyword">continue</span>
+			}
+			countLines(f, counts)
+			f.Close()
+		}
+	}
+	<span class="hljs-keyword">for</span> line, n := <span class="hljs-keyword">range</span> counts {
+		<span class="hljs-keyword">if</span> n &gt; <span class="hljs-number">1</span> {
+			fmt.Printf(<span class="hljs-string">&quot;%d\t%s\n&quot;</span>, n, line)
+		}
+	}
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">countLines</span><span class="hljs-params">(f *os.File, counts <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)</span></span>{ <span class="hljs-comment">//</span>
+	input := bufio.NewScanner(f)
+	<span class="hljs-keyword">for</span> input.Scan() {
+		counts[input.Text()] ++  <span class="hljs-comment">// 这里传map 是传的副本, 在函数内做修改原来的map也会变动</span>
+	}
+}
+</code></pre>
+<ul>
+<li>以上方法一直使用流式输入,但是也有另一种方法,直接读入一大块进内存之后再分割</li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	counts := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)
+	<span class="hljs-keyword">for</span> _, filename := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		data, err := os.ReadFile(filename)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;dup3: %v\n&quot;</span>, err)
+			<span class="hljs-keyword">continue</span>
+		}
+		<span class="hljs-keyword">for</span> _, line := <span class="hljs-keyword">range</span> strings.Split(<span class="hljs-type">string</span>(data), <span class="hljs-string">&quot;\n&quot;</span>){ <span class="hljs-comment">// 读入后划分</span>
+			counts[line]++
+		}
+	}
+	<span class="hljs-keyword">for</span> line, n := <span class="hljs-keyword">range</span> counts{
+		<span class="hljs-keyword">if</span> n &gt; <span class="hljs-number">1</span>{
+			fmt.Printf(<span class="hljs-string">&quot;%d\t%s\n&quot;</span>, n, line)
+		}
+	}
+}
+
+</code></pre>
+<pre><code class="language-go">\\ 练习<span class="hljs-number">1.4</span>
+<span class="hljs-comment">// 基本逻辑, 先存起来每行的信息, 然后对于每个文件, 重复以下行动, 首先对于每个句子统计,之后判断是否重复, 之后消去影响</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;bufio&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	counts := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)
+	files := os.Args[<span class="hljs-number">1</span>:]
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(files) &gt; <span class="hljs-number">0</span>{
+		<span class="hljs-keyword">for</span> _, arg := <span class="hljs-keyword">range</span> files {
+			f, err := os.Open(arg)
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;dup2: %v\n&quot;</span>, err)
+				<span class="hljs-keyword">continue</span>
+			}
+			countLines(f, counts)
+			<span class="hljs-keyword">for</span> _, n := <span class="hljs-keyword">range</span> counts{
+				<span class="hljs-keyword">if</span> n &gt; <span class="hljs-number">1</span>{
+					fmt.Printf(<span class="hljs-string">&quot;%s\n&quot;</span>, arg)
+					<span class="hljs-keyword">break</span>
+				}
+			}
+			f.Close()
+			f, err = os.Open(arg)
+			<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;dup2: %v\n&quot;</span>, err)
+				<span class="hljs-keyword">continue</span>
+			}
+			decountLines(f, counts)
+			f.Close()
+		}
+	}
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">countLines</span><span class="hljs-params">(f *os.File, counts <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)</span></span>{
+	input := bufio.NewScanner(f)
+	<span class="hljs-keyword">for</span> input.Scan() {
+		counts[input.Text()] ++
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">decountLines</span><span class="hljs-params">(f *os.File, counts <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)</span></span>{
+	input := bufio.NewScanner(f)
+	<span class="hljs-keyword">for</span> input.Scan(){
+		<span class="hljs-comment">//print(&quot;!&quot;)</span>
+		counts[input.Text()] --
+	}
+}
+
+</code></pre>
+<h2 id="gif-动画">GIF 动画</h2>
+<pre><code class="language-go"><span class="hljs-comment">// 用于产生随机利萨茹图形的GIF动画</span>
+<span class="hljs-comment">// 本地打不开, 但是联网能打开</span>
+<span class="hljs-comment">// 联网方式, 命令后添加web选项,然后访问对应端口</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/gif&quot;</span> <span class="hljs-comment">// 在导入多段路径组成的包后, 使用路径的最后一段来引用这个包</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+	<span class="hljs-string">&quot;math/rand&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> palette = []color.Color{color.White, color.Black} <span class="hljs-comment">//复合字面量 数组</span>
+<span class="hljs-keyword">const</span> ( <span class="hljs-comment">// 常量命名, 数字,字符串,bool</span>
+	whiteIndex = <span class="hljs-number">0</span>
+	blackIndex = <span class="hljs-number">1</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//rand.Seed(time.Now().UTC().UnixNano())</span>
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(os.Args) &gt; <span class="hljs-number">1</span> &amp;&amp; os.Args[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;web&quot;</span> {
+		handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+			lissajous(w)
+		}
+		http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+		<span class="hljs-keyword">return</span>
+	}
+	lissajous(os.Stdout)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lissajous</span><span class="hljs-params">(out io.Writer)</span></span> {
+	<span class="hljs-keyword">const</span> (
+		cycles = <span class="hljs-number">5</span>
+		res = <span class="hljs-number">0.001</span>
+		size = <span class="hljs-number">100</span>
+		nframes = <span class="hljs-number">64</span>
+		delay = <span class="hljs-number">8</span>
+	)
+	freq := rand.Float64() * <span class="hljs-number">3.0</span>
+	anim := gif.GIF{LoopCount: nframes} <span class="hljs-comment">// 复合字面量, 结构体</span>
+	phase := <span class="hljs-number">0.0</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; nframes; i++{
+		rect := image.Rect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>)
+		img := image.NewPaletted(rect, palette)
+		<span class="hljs-keyword">for</span> t := <span class="hljs-number">0.0</span>; t &lt; cycles * <span class="hljs-number">2</span> * math.Pi; t += res{
+			x := math.Sin(t)
+			y := math.Sin(t * freq + phase)
+			img.SetColorIndex(size+<span class="hljs-type">int</span>(x*size+<span class="hljs-number">0.5</span>), size+<span class="hljs-type">int</span>(y * size + <span class="hljs-number">0.5</span>), blackIndex)
+		}
+		phase += <span class="hljs-number">0.1</span>
+		anim.Delay = <span class="hljs-built_in">append</span>(anim.Delay, delay)
+		anim.Image = <span class="hljs-built_in">append</span>(anim.Image, img)
+	}
+	gif.EncodeAll(out, &amp;anim)
+}
+
+
+</code></pre>
+<ul>
+<li>练习1.5</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">//</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/gif&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+	<span class="hljs-string">&quot;math/rand&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> palette = []color.Color{color.RGBA{<span class="hljs-number">0x3D</span>, <span class="hljs-number">0x91</span>, <span class="hljs-number">0x40</span>, <span class="hljs-number">0xff</span>}, color.Black} <span class="hljs-comment">// 查找RGB颜色来设置对应颜色</span>
+<span class="hljs-keyword">const</span> (
+	whiteIndex = <span class="hljs-number">0</span>
+	blackIndex = <span class="hljs-number">1</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(os.Args) &gt; <span class="hljs-number">1</span> &amp;&amp; os.Args[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;web&quot;</span>{
+		handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{
+			lissajous(w)
+		}
+		http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+		<span class="hljs-keyword">return</span> 
+	}
+	lissajous(os.Stdout)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lissajous</span><span class="hljs-params">(out io.Writer)</span></span>{
+	<span class="hljs-keyword">const</span>(
+		cycles = <span class="hljs-number">5</span>
+		res = <span class="hljs-number">0.001</span>
+		size = <span class="hljs-number">100</span>
+		nframes = <span class="hljs-number">64</span>
+		delay = <span class="hljs-number">8</span>
+	)
+	freq := rand.Float64() * <span class="hljs-number">3.0</span>
+	anim := gif.GIF{LoopCount: nframes} <span class="hljs-comment">// 复合字面量, 结构体</span>
+	phase := <span class="hljs-number">0.0</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; nframes; i++{
+		rect := image.Rect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>)
+		img := image.NewPaletted(rect, palette)
+		<span class="hljs-keyword">for</span> t := <span class="hljs-number">0.0</span>; t &lt; cycles * <span class="hljs-number">2</span> * math.Pi; t += res{
+			x := math.Sin(t)
+			y := math.Sin(t * freq + phase)
+			img.SetColorIndex(size+<span class="hljs-type">int</span>(x*size+<span class="hljs-number">0.5</span>), size+<span class="hljs-type">int</span>(y * size + <span class="hljs-number">0.5</span>), blackIndex)
+		}
+		phase += <span class="hljs-number">0.1</span>
+		anim.Delay = <span class="hljs-built_in">append</span>(anim.Delay, delay)
+		anim.Image = <span class="hljs-built_in">append</span>(anim.Image, img)
+	}
+	gif.EncodeAll(out, &amp;anim)
+}
+	
+</code></pre>
+<ul>
+<li>练习1.6</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">//</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/gif&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+	<span class="hljs-string">&quot;math/rand&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> palette = []color.Color{color.RGBA{<span class="hljs-number">0x3D</span>, <span class="hljs-number">0x91</span>, <span class="hljs-number">0x40</span>, <span class="hljs-number">0xff</span>}, color.RGBA{<span class="hljs-number">0x29</span>, <span class="hljs-number">0x24</span>, <span class="hljs-number">0x21</span>, <span class="hljs-number">0xff</span>}}
+<span class="hljs-keyword">const</span> (
+	whiteIndex = <span class="hljs-number">0</span>
+	blackIndex = <span class="hljs-number">1</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(os.Args) &gt; <span class="hljs-number">1</span> &amp;&amp; os.Args[<span class="hljs-number">1</span>] == <span class="hljs-string">&quot;web&quot;</span>{
+		handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{
+			lissajous(w)
+		}
+		http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+		<span class="hljs-keyword">return</span> 
+	}
+	lissajous(os.Stdout)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lissajous</span><span class="hljs-params">(out io.Writer)</span></span>{
+	<span class="hljs-keyword">const</span>(
+		cycles = <span class="hljs-number">5</span>
+		res = <span class="hljs-number">0.001</span>
+		size = <span class="hljs-number">100</span>
+		nframes = <span class="hljs-number">64</span>
+		delay = <span class="hljs-number">8</span>
+	)
+	freq := rand.Float64() * <span class="hljs-number">3.0</span>
+	anim := gif.GIF{LoopCount: nframes} <span class="hljs-comment">// 复合字面量, 结构体</span>
+	phase := <span class="hljs-number">0.0</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; nframes; i++{
+		rect := image.Rect(<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>, <span class="hljs-number">2</span> * size + <span class="hljs-number">1</span>)
+		img := image.NewPaletted(rect, palette)
+		tmp := <span class="hljs-type">uint8</span>(<span class="hljs-number">1</span>)
+		<span class="hljs-keyword">for</span> t := <span class="hljs-number">0.0</span>; t &lt; cycles * <span class="hljs-number">2</span> * math.Pi; t += res{
+			x := math.Sin(t)
+			y := math.Sin(t * freq + phase)
+			img.SetColorIndex(size+<span class="hljs-type">int</span>(x*size+<span class="hljs-number">0.5</span>), size+<span class="hljs-type">int</span>(y * size + <span class="hljs-number">0.5</span>), tmp)
+		}
+		phase += <span class="hljs-number">0.1</span>
+		tmp += <span class="hljs-number">1</span>  <span class="hljs-comment">// 轮流出现</span>
+		tmp %= <span class="hljs-number">2</span>
+		anim.Delay = <span class="hljs-built_in">append</span>(anim.Delay, delay)
+		anim.Image = <span class="hljs-built_in">append</span>(anim.Image, img)
+	}
+	gif.EncodeAll(out, &amp;anim)
+}
+</code></pre>
+<h2 id="获取一个url">获取一个URL</h2>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		resp, err := http.Get(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">1</span>)
+		}
+		b, err := io.ReadAll(resp.Body) <span class="hljs-comment">// ioutil包现在是io包</span>
+		resp.Body.Close() <span class="hljs-comment">//关闭数据流来避免资源泄漏，</span>
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch reading: %v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">1</span>)
+		}
+		fmt.Printf(<span class="hljs-string">&quot;%s&quot;</span>, b)
+	}
+}
+</code></pre>
+<pre><code class="language-go"><span class="hljs-comment">// 练习1.7</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		resp, err := http.Get(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch:%v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">1</span>)
+		}
+		_, err = io.Copy(os.Stdout, resp.Body)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;copy%v\n&quot;</span>, err)
+		}
+		resp.Body.Close()
+	}
+
+}
+</code></pre>
+<pre><code class="language-go">\\ 练习<span class="hljs-number">1.8</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		<span class="hljs-keyword">if</span> ! strings.HasPrefix(url, <span class="hljs-string">&quot;http://&quot;</span>) &amp;&amp; ! strings.HasPrefix(url, <span class="hljs-string">&quot;https://&quot;</span>) {
+			url = <span class="hljs-string">&quot;http://&quot;</span> + url
+		}
+		resp, err := http.Get(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">0</span>)
+		}
+		io.Copy(os.Stdout, resp.Body)
+		resp.Body.Close()
+	}
+}
+
+</code></pre>
+<pre><code class="language-go">\\ 练习<span class="hljs-number">1.9</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		resq, err := http.Get(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch %v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">0</span>)
+		}
+		fmt.Printf(<span class="hljs-string">&quot;%v\n&quot;</span>, resq.StatusCode) <span class="hljs-comment">// 状态码， StatusCode</span>
+		resq.Body.Close()
+	}
+}
+</code></pre>
+<h2 id="服务器">服务器</h2>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler) <span class="hljs-comment">// 使用handler函数 处理所有请求</span>
+	log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))<span class="hljs-comment">// 先打印日志到标准输出， 调用os.exit(1), 到那时defer函数不会被调用</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{ <span class="hljs-comment">// handler格式， </span>
+	fmt.Fprintf(w, <span class="hljs-string">&quot;URL.Path = %q\n&quot;</span>, r.URL.Path)
+
+}
+
+
+
+</code></pre>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;sync&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> mu sync.Mutex
+<span class="hljs-keyword">var</span> count <span class="hljs-type">int</span> 
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler) 
+	http.HandleFunc(<span class="hljs-string">&quot;/count&quot;</span>, counter)
+	log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>)) <span class="hljs-comment">// Listen</span>
+}
+
+<span class="hljs-comment">/*
+出现问题， 使用浏览器访问的时候会调用两次接口
+原因是图标也算一次
+不用浏览器访问就好啦
+
+
+*/</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handler</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{
+	mu.Lock()
+	count++
+	fmt.Fprintf(w, <span class="hljs-string">&quot;Count %d ffff \n&quot;</span>, count)
+	mu.Unlock()
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">counter</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{
+	mu.Lock()
+	fmt.Fprintf(w, <span class="hljs-string">&quot;Count %d\n&quot;</span>, count)
+	mu.Unlock()
+}
+
+</code></pre>
+<pre><code class="language-go"><span class="hljs-comment">// 更完整的例子， 报告接收到的消息头和表单数据</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handle)
+	log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">handle</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{ <span class="hljs-comment">// 前者输出， 后者输入</span>
+
+	fmt.Fprintf(w, <span class="hljs-string">&quot;%s %s %s\n&quot;</span>, r.Method, r.URL, r.Proto)
+	<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> r.Header{
+		fmt.Fprintf(w, <span class="hljs-string">&quot;Header[%q] = %q\n&quot;</span>, k, v)
+	}
+	fmt.Fprintf(w, <span class="hljs-string">&quot;Host = %q\n&quot;</span>, r.Host)
+	fmt.Fprintf(w, <span class="hljs-string">&quot;RemoteAddr = %q\n&quot;</span>, r.RemoteAddr)
+	<span class="hljs-keyword">if</span> err := r.ParseForm(); err != <span class="hljs-literal">nil</span>{ <span class="hljs-comment">// 将err := r.ParseForm() 嵌入到if 判断条件前， 作用域缩小</span>
+		log.Print(err)
+	}
+	<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> r.Form {
+		fmt.Fprintf(w, <span class="hljs-string">&quot;Form[%q] = %q\n&quot;</span>, k, v)
+	}
+	
+}
+</code></pre>
+<h3 id="httprequest-包含内容">http.Request 包含内容</h3>
+<ul>
+<li>Header type Header map[string][]string</li>
+<li>Body 请求体</li>
+<li>GetBody 返回Body的新副本</li>
+<li>ContentLength int64 关联内容长度</li>
+<li>TransferEncoding []string  列出了从最外层到最内层的传输编码， 一般会被忽略，当发送或者接受请求时，会自动添加或者移除”chunked“传输编码</li>
+<li>Close bool 连接结束后是否关闭</li>
+<li>Host string 服务器主机地址</li>
+<li>Form url.Values 表单数据</li>
+<li>PostForm url.Values  也是表单</li>
+<li>MultipartForm *multipaort.Form  解析多部分表单</li>
+<li>Trailer Header 表示在请求体后添加附加头</li>
+<li>RemoteAddr string</li>
+<li>RequestURL string</li>
+<li>TLS *tls.ConnectionState</li>
+<li>Cancel &lt;-chan struct{} 一个可选通道</li>
+<li>Response * Response 此请求的重定向响应</li>
+</ul>
+<h2 id="控制流">控制流</h2>
+<ul>
+<li>if for switch(switch 不需要加break) 可以通过加fallthrough来连接到下一级</li>
+<li>switch 可以允许不带对象</li>
+<li>switch 可以紧跟简短变量声明</li>
+</ul>
+<h2 id="go-doc">go doc</h2>
+<ul>
+<li>可以在本地直接命令行阅读标准库的文档。</li>
+<li>建议：在源文件的开头写注释， 每一个函数之前写一个说明函数行为的注释， 容易使得被godoc这样的工具检测到</li>
+</ul>
+<h1 id="go-kit-基础服务">go-kit 基础服务</h1>
+<h1 id="others">Others</h1>
+<h5 id="概念完整性">概念完整性</h5>
+<ul>
+<li>概念的完整性，是指针对于一个领域，不仅了解该领域的所有对象，并且了解所有对象之间的关系。</li>
+<li>了解所有对象之间的关系，并不是感性了解，而是理性了解，并不是将所有的信息都知道就可以了，需要达到一定的理性认识，达到一定的抽象才行。</li>
+</ul>
+<h1 id="第二章">第二章</h1>
+<ul>
+<li>实体的第一个字母的大小写决定其可见性是否跨包， 如果是大写开头， 说明是导出的， 可以被自己包之外的其他程序所调用</li>
+<li>包名称永远是小写纯字母</li>
+<li>名称的作用域越大，就使用越长且更有意义的名称</li>
+<li>驼峰式命名法，首字母缩写词往往使用相同的大小写</li>
+<li>go中不允许出现未被定义的变量， 所有类型的变量都应当有直接可用的零值</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">const</span> freezingF, boilingF = <span class="hljs-number">32.0</span>, <span class="hljs-number">212.0</span>
+	fmt.Printf(<span class="hljs-string">&quot;freezing %g C\n&quot;</span>,fToC(freezingF))
+	fmt.Printf(<span class="hljs-string">&quot;boiling %g C\n&quot;</span>, fToC(boilingF))
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fToC</span><span class="hljs-params">(f <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span>{
+	<span class="hljs-keyword">return</span> (f <span class="hljs-number">-32</span>) * <span class="hljs-number">5</span> / <span class="hljs-number">9</span>
+}
+</code></pre>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-keyword">const</span> boilingF = <span class="hljs-number">212.0</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">var</span> f = boilingF
+	<span class="hljs-keyword">var</span> c = (f - <span class="hljs-number">32</span>) * <span class="hljs-number">5</span> / <span class="hljs-number">9</span>
+	fmt.Printf(<span class="hljs-string">&quot;boiling point = %g F or %g C\n&quot;</span>, f, c)
+}
+
+</code></pre>
+<pre><code class="language-go"><span class="hljs-comment">// 第四版</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;flag&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> n = flag.Bool(<span class="hljs-string">&quot;n&quot;</span>, <span class="hljs-literal">false</span>, <span class="hljs-string">&quot;omit trailing newline&quot;</span>)
+<span class="hljs-keyword">var</span> sep = flag.String(<span class="hljs-string">&quot;s&quot;</span>, <span class="hljs-string">&quot; &quot;</span>, <span class="hljs-string">&quot;separator&quot;</span>)
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	flag.Parse()
+	fmt.Print(strings.Join(flag.Args(), *sep))
+	<span class="hljs-keyword">if</span> !*n {
+		fmt.Println()
+	}
+}
+
+
+</code></pre>
+<ul>
+<li>flag包简介：<a href="https://www.cnblogs.com/sparkdev/p/10812422.html">https://www.cnblogs.com/sparkdev/p/10812422.html</a></li>
+</ul>
+<h3 id="类型声明">类型声明</h3>
+<ul>
+<li>type name underlying-type</li>
+<li>一般会放在函数外面全包使用， 若首字母大写则可导出包外</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 进行摄氏温度和华氏温度的转换</span>
+<span class="hljs-keyword">package</span> main
+
+
+<span class="hljs-keyword">type</span> Celsius <span class="hljs-type">float64</span>
+<span class="hljs-keyword">type</span> Fahrenheit <span class="hljs-type">float64</span>
+
+<span class="hljs-keyword">const</span> (
+	AbsoluteZeroC Celsius = <span class="hljs-number">-273.15</span>
+	FreezingC Celsius = <span class="hljs-number">0</span>
+	BoilingC Celsius = <span class="hljs-number">100</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CToF</span><span class="hljs-params">(c Celsius)</span></span> Fahrenheit { <span class="hljs-keyword">return</span> Fahrenheit(c * <span class="hljs-number">9</span> / <span class="hljs-number">5</span> + <span class="hljs-number">32</span>)}  <span class="hljs-comment">// 构造时若两个底层是相同类型可以直接构造</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FtoC</span><span class="hljs-params">(f Fahrenheit)</span></span> Celsius { <span class="hljs-keyword">return</span> Celsius((f - <span class="hljs-number">32</span>) * <span class="hljs-number">5</span> / <span class="hljs-number">9</span>)}
+</code></pre>
+<ul>
+<li>命名类型之后类似于继承，可以重新定义类型的行为， 类似于下面</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(c Celsius)</span></span> String() <span class="hljs-type">string</span>() {<span class="hljs-keyword">return</span> fmt.Sprintf(<span class="hljs-string">&quot;%g°C&quot;</span>, c)} <span class="hljs-comment">// fmt 在将元素输出时，会优先调用函数的toString（）方法</span>
+</code></pre>
+<h3 id="包">包</h3>
+<ul>
+<li>
+<p>每个包对应一个独立的命名空间， 需要明确指出包来调用， 只有名字以大写字母开头的信息才是导出的， （汉字不导出）</p>
+</li>
+<li>
+<p>可以将之前的代码分成两个文件， 并且导出包</p>
+</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 用于进行摄氏度与华氏度之间的转换   tempconv.go</span>
+<span class="hljs-keyword">package</span> tempconv 
+
+
+<span class="hljs-keyword">type</span> Celsius <span class="hljs-type">float64</span>
+<span class="hljs-keyword">type</span> Fahrenheit <span class="hljs-type">float64</span>
+
+<span class="hljs-keyword">const</span> (
+	AbsoluteZeroC Celsius = <span class="hljs-number">-273.15</span>
+	FreezingC Celsius = <span class="hljs-number">0</span>
+	BoilingC Celsius = <span class="hljs-number">100</span>
+)
+
+</code></pre>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> tempconv <span class="hljs-comment">// conv.go</span>
+
+<span class="hljs-comment">// 摄氏度转华氏度</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CToF</span><span class="hljs-params">(c Celsius)</span></span> Fahrenheit { <span class="hljs-keyword">return</span> Fahrenheit(c * <span class="hljs-number">9</span> / <span class="hljs-number">5</span> + <span class="hljs-number">32</span>)}  <span class="hljs-comment">// 构造时若两个底层是相同类型可以直接构造</span>
+
+<span class="hljs-comment">// 华氏度转摄氏度</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FtoC</span><span class="hljs-params">(f Fahrenheit)</span></span> Celsius { <span class="hljs-keyword">return</span> Celsius((f - <span class="hljs-number">32</span>) * <span class="hljs-number">5</span> / <span class="hljs-number">9</span>)}
+</code></pre>
+<ul>
+<li>flag</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 练习2.1 注意函数复用</span>
+<span class="hljs-comment">// 进行摄氏温度和华氏温度以及绝对温度的转换</span>
+<span class="hljs-keyword">package</span> main
+
+
+<span class="hljs-keyword">type</span> Celsius <span class="hljs-type">float64</span>
+<span class="hljs-keyword">type</span> Fahrenheit <span class="hljs-type">float64</span>
+<span class="hljs-keyword">type</span> Kelvin <span class="hljs-type">float64</span> 
+
+<span class="hljs-keyword">const</span> (
+	AbsoluteZeroC Celsius = <span class="hljs-number">-273.15</span>
+	FreezingC Celsius = <span class="hljs-number">0</span>
+	BoilingC Celsius = <span class="hljs-number">100</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CToF</span><span class="hljs-params">(c Celsius)</span></span> Fahrenheit { <span class="hljs-keyword">return</span> Fahrenheit(c * <span class="hljs-number">9</span> / <span class="hljs-number">5</span> + <span class="hljs-number">32</span>)}  <span class="hljs-comment">// 构造时若两个底层是相同类型可以直接构造</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FtoC</span><span class="hljs-params">(f Fahrenheit)</span></span> Celsius { <span class="hljs-keyword">return</span> Celsius((f - <span class="hljs-number">32</span>) * <span class="hljs-number">5</span> / <span class="hljs-number">9</span>)}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">KtoC</span><span class="hljs-params">(k Kelvin)</span></span> Celsius {<span class="hljs-keyword">return</span> Celsius(k + Kelvin(AbsoluteZeroC))}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">KtoF</span><span class="hljs-params">(k Kelvin)</span></span> Fahrenheit {<span class="hljs-keyword">return</span> Fahrenheit(CToF(KtoC(k)))}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">CtoK</span><span class="hljs-params">(c Celsius)</span></span> Kelvin {<span class="hljs-keyword">return</span> Kelvin(c - AbsoluteZeroC)}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">FtoK</span><span class="hljs-params">(f Fahrenheit)</span></span> Kelvin {<span class="hljs-keyword">return</span> CtoK(FtoC(f))}
+</code></pre>
+<h3 id="导入包">导入包</h3>
+<pre><code class="language-go">
+<span class="hljs-comment">// 导入tempconv包</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+	<span class="hljs-string">&quot;strconv&quot;</span>
+
+	<span class="hljs-string">&quot;./learning/tempconv&quot;</span> <span class="hljs-comment">// go 调用不同位置的包 ，https://blog.csdn.net/Working_hard_111/article/details/139982343</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> _, arg := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:]{
+		t, err := strconv.ParseFloat(arg, <span class="hljs-number">64</span>)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;cf: %v\n&quot;</span>, err)
+			os.Exit(<span class="hljs-number">1</span>)
+		}
+		f := tempconv.Fahrenheit(t)
+		c := tempconv.Celsius(t)
+		fmt.Printf(<span class="hljs-string">&quot;%s = %s, %s = %s\n&quot;</span>, f, tempconv.FtoC(f), c, tempconv.CToF(c))
+	}
+}
+</code></pre>
+<ul>
+<li>包的初始化， 使用init（）函数， 该函数不能被调用或者引用， 每个文件中init初始化函数在程序执行的时候直接调用</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 用来统计输入数的二进制1数目</span>
+<span class="hljs-keyword">package</span> popcount
+
+<span class="hljs-keyword">var</span> pc [<span class="hljs-number">256</span>]<span class="hljs-type">byte</span> 
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> pc { <span class="hljs-comment">// 直接可以将slice当参数</span>
+		pc[i] = pc[i / <span class="hljs-number">2</span>] + <span class="hljs-type">byte</span>(i &amp; <span class="hljs-number">1</span>) <span class="hljs-comment">// byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数</span>
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PopCount</span><span class="hljs-params">(x <span class="hljs-type">uint64</span>)</span></span> <span class="hljs-type">int</span>{
+	<span class="hljs-keyword">return</span> <span class="hljs-type">int</span>(pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">0</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">1</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">2</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">3</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">4</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">5</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">6</span> * <span class="hljs-number">8</span>))] +
+		pc[<span class="hljs-type">byte</span>(x &gt;&gt; (<span class="hljs-number">7</span> * <span class="hljs-number">8</span>))])
+}
+</code></pre>
+<h4 id="练习23">练习2.3</h4>
+<ul>
+<li>重写PopCount函数，用一个循环代替单一的表达式。比较两个版本的性能。（11.4节将展示如何系统地比较两个不同实现的性能。）</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 用来统计输入数的二进制1数目</span>
+<span class="hljs-keyword">package</span> popcount
+
+<span class="hljs-keyword">var</span> pc [<span class="hljs-number">256</span>]<span class="hljs-type">byte</span> 
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> pc { <span class="hljs-comment">// 直接可以将slice当参数</span>
+		pc[i] = pc[i / <span class="hljs-number">2</span>] + <span class="hljs-type">byte</span>(i &amp; <span class="hljs-number">1</span>) <span class="hljs-comment">// byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数</span>
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PopCount</span><span class="hljs-params">(x <span class="hljs-type">uint64</span>)</span></span> <span class="hljs-type">int</span>{
+
+	ans := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span> ; i &lt; <span class="hljs-number">8</span>; i++ {  <span class="hljs-comment">// 写成循环形式</span>
+		ans += <span class="hljs-type">int</span>(<span class="hljs-type">byte</span>(x &gt;&gt; (i * <span class="hljs-number">8</span>)))
+	}
+	<span class="hljs-keyword">return</span> ans
+}
+</code></pre>
+<h4 id="练习24">练习2.4</h4>
+<ul>
+<li>用移位算法重写PopCount函数，每次测试最右边的1bit，然后统计总数。比较和查表算法的性能差异。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 用来统计输入数的二进制1数目</span>
+<span class="hljs-keyword">package</span> popcount
+
+<span class="hljs-keyword">var</span> pc [<span class="hljs-number">256</span>]<span class="hljs-type">byte</span> 
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> pc { <span class="hljs-comment">// 直接可以将slice当参数</span>
+		pc[i] = pc[i / <span class="hljs-number">2</span>] + <span class="hljs-type">byte</span>(i &amp; <span class="hljs-number">1</span>) <span class="hljs-comment">// byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数</span>
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PopCount</span><span class="hljs-params">(x <span class="hljs-type">uint64</span>)</span></span> <span class="hljs-type">int</span>{
+
+	ans := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">for</span> ; x != <span class="hljs-number">0</span> ; x &gt;&gt;= <span class="hljs-number">1</span>{   <span class="hljs-comment">// 每次右移一位</span>
+		<span class="hljs-keyword">if</span> x &amp; <span class="hljs-number">1</span> == <span class="hljs-number">1</span>{
+			ans ++
+		}
+	}
+	<span class="hljs-keyword">return</span> ans
+}
+
+</code></pre>
+<h4 id="练习25">练习2.5</h4>
+<ul>
+<li>表达式x&amp;(x-1)用于将x的最低的一个非零的bit位清零。使用这个算法重写PopCount函数，然后比较性能。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 用来统计输入数的二进制1数目</span>
+<span class="hljs-keyword">package</span> popcount
+
+<span class="hljs-keyword">var</span> pc [<span class="hljs-number">256</span>]<span class="hljs-type">byte</span> 
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> pc { <span class="hljs-comment">// 直接可以将slice当参数</span>
+		pc[i] = pc[i / <span class="hljs-number">2</span>] + <span class="hljs-type">byte</span>(i &amp; <span class="hljs-number">1</span>) <span class="hljs-comment">// byte 可以返回1的个数, pc[i] 表示数字i 二进制时1的位置个数</span>
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">PopCount</span><span class="hljs-params">(x <span class="hljs-type">uint64</span>)</span></span> <span class="hljs-type">int</span>{
+
+	ans := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">for</span> ; x != <span class="hljs-number">0</span> ; x = x &amp; (x - <span class="hljs-number">1</span>){   <span class="hljs-comment">// x - lowbit(x)</span>
+			ans ++
+	}
+	<span class="hljs-keyword">return</span> ans
+}
+</code></pre>
+<h3 id="作用域">作用域</h3>
+<ul>
+<li>作用域不等于生命周期， 作用域是编码阶段的概念，生命周期是运行时的概念</li>
+<li>go 中编译器会一层层地向外搜寻合适的范围，</li>
+<li>for, if, switch 会产生新的词法域</li>
+<li>这个部分要注意好的编码习惯， 尽量不用相同的变量名， 但是go是允许使用相同的变量名的</li>
+</ul>
+<h1 id="第三章">第三章</h1>
+<ul>
+<li>Go语言数据类型分为四类： 基础类型、复合类型、引用类型和接口类型</li>
+<li>基础类型： 数字、 字符串、 bool型、</li>
+<li>复合类型：数组、结构体、</li>
+<li>引用类型： 指针、 切片、 字典、 函数、 通道</li>
+<li>接口类型： 第七章</li>
+</ul>
+<h2 id="数据类型">数据类型</h2>
+<ul>
+<li>Go 在运算时要求比较严格，只允许相同类型的进行运算</li>
+<li>整型分为 有符号和无符号， 每种都分为 8，16，32，64位</li>
+<li>还有一种对应CPU平台的类型， int和 uint</li>
+<li>还用一种无符号的整数类型uintptr, 没有具体的bit大小但是足以容纳指针</li>
+<li>浮点数转整数的方式是丢弃小数部分， 然后向数轴方向折断</li>
+<li>浮点数只有两种， float32 和float64</li>
+<li>Nan 的比较总是不成立， 但是！= 会成立</li>
+<li>浮点数输出可以有%e 科学计数法， %f 小数点， 两种方法， 使用%g可以自动生成</li>
+</ul>
+<h2 id="运算符">运算符</h2>
+<ul>
+<li>基本上和c++ 相同</li>
+<li>&amp;^  为位清空操作</li>
+</ul>
+<h2 id="实例">实例</h2>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+)
+
+<span class="hljs-keyword">const</span> (
+	width, height = <span class="hljs-number">600</span>, <span class="hljs-number">320</span>
+	cells         = <span class="hljs-number">100</span>
+	xyrange       = <span class="hljs-number">30.0</span>
+	xyscale       = width / <span class="hljs-number">2</span> / xyrange
+	zscale        = height * <span class="hljs-number">0.4</span>
+	angle         = math.Pi / <span class="hljs-number">6</span>
+)
+<span class="hljs-keyword">var</span> sin30 = math.Sin(angle) <span class="hljs-comment">// Go的常量是在编译之前就能确定的常量</span>
+<span class="hljs-keyword">var</span> cos30 = math.Cos(angle)
+
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	fmt.Printf(<span class="hljs-string">&quot;&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;style=&#x27;stroke: grey; fill: white; stroke-width: 0.7&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;width=&#x27;%d&#x27; height=&#x27;%d&#x27;&gt;&quot;</span>, width, height)
+	<span class="hljs-keyword">for</span> i:= <span class="hljs-number">0</span>; i &lt; cells; i++ {
+		<span class="hljs-keyword">for</span> j := <span class="hljs-number">0</span>; j &lt; cells; j++ {
+			ax, ay := corner(i + <span class="hljs-number">1</span>, j)
+			bx, by := corner(i, j)
+			cx, cy := corner(i, j + <span class="hljs-number">1</span>)
+			dx, dy := corner(i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>)
+			fmt.Printf(<span class="hljs-string">&quot;&lt;polygon points=&#x27;%g,%g %g,%g %g,%g %g,%g&#x27;/&gt;\n&quot;</span>,
+                ax, ay, bx, by, cx, cy, dx, dy)
+		}
+	}
+	fmt.Println(<span class="hljs-string">&quot;&lt;/svg&gt;&quot;</span>)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">corner</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> (<span class="hljs-type">float64</span>, <span class="hljs-type">float64</span>) { <span class="hljs-comment">// 返回网格顶点的坐标参数</span>
+	x := xyrange * (<span class="hljs-type">float64</span>(i) / cells - <span class="hljs-number">0.5</span>)
+	y := xyrange * (<span class="hljs-type">float64</span>(j) / cells - <span class="hljs-number">0.5</span>)
+	z := f(x, y)
+	sx := width / <span class="hljs-number">2</span> + (x - y) * cos30 * xyscale
+	sy := height / <span class="hljs-number">2</span> + (x + y) * sin30 * xyscale - z * zscale
+	<span class="hljs-keyword">return</span> sx, sy
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">f</span><span class="hljs-params">(x, y <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> {
+	r := math.Hypot(x, y)
+	<span class="hljs-keyword">return</span> math.Sin(r) / r
+}
+</code></pre>
+<h3 id="练习31">练习3.1</h3>
+<ul>
+<li>如果f函数返回的是无限制的float64值，那么SVG文件可能输出无效的多边形元素（虽然许多SVG渲染器会妥善处理这类问题）。修改程序跳过无效的多边形。</li>
+</ul>
+<pre><code class="language-go">\\练习<span class="hljs-number">3.1</span> 更改的代码
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	fmt.Printf(<span class="hljs-string">&quot;&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;style=&#x27;stroke: grey; fill: white; stroke-width: 0.7&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;width=&#x27;%d&#x27; height=&#x27;%d&#x27;&gt;&quot;</span>, width, height)
+	<span class="hljs-keyword">for</span> i:= <span class="hljs-number">0</span>; i &lt; cells; i++ {
+		<span class="hljs-keyword">for</span> j := <span class="hljs-number">0</span>; j &lt; cells; j++ {
+			ax, ay := corner(i + <span class="hljs-number">1</span>, j)
+			bx, by := corner(i, j)
+			cx, cy := corner(i, j + <span class="hljs-number">1</span>)
+			dx, dy := corner(i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>)
+			<span class="hljs-keyword">if</span> math.IsNaN(ax) || math.IsNaN(ay) || math.IsNaN(bx) || math.IsNaN(by) || math.IsNaN(cx) || math.IsNaN(cy) || math.IsNaN(dx) || math.IsNaN(dy) {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;NAN&quot;</span>)
+			} <span class="hljs-keyword">else</span> {
+				fmt.Printf(<span class="hljs-string">&quot;&lt;polygon points=&#x27;%g,%g %g,%g %g,%g %g,%g&#x27;/&gt;\n&quot;</span>,
+                ax, ay, bx, by, cx, cy, dx, dy)
+			}
+		}
+	}
+	fmt.Println(<span class="hljs-string">&quot;&lt;/svg&gt;&quot;</span>)
+}
+
+</code></pre>
+<h3 id="练习32">练习3.2</h3>
+<ul>
+<li>试验math包中其他函数的渲染图形。你是否能输出一个egg box、moguls或a saddle图案?</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 练习3.2 更改一下z轴函数即可</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">corner</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> (<span class="hljs-type">float64</span>, <span class="hljs-type">float64</span>) {
+	x := xyrange * (<span class="hljs-type">float64</span>(i) / cells - <span class="hljs-number">0.5</span>)
+	y := xyrange * (<span class="hljs-type">float64</span>(j) / cells - <span class="hljs-number">0.5</span>)
+	<span class="hljs-comment">//z := f(x, y)</span>
+	z := eggBox(x, y)
+	sx := width / <span class="hljs-number">2</span> + (x - y) * cos30 * xyscale
+	sy := height / <span class="hljs-number">2</span> + (x + y) * sin30 * xyscale - z * zscale
+	<span class="hljs-keyword">return</span> sx, sy
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">eggBox</span><span class="hljs-params">(x, y <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> {
+	<span class="hljs-keyword">return</span> math.Sin(x) + math.Sin(y) / <span class="hljs-number">10</span>
+}
+</code></pre>
+<h3 id="练习33">练习3.3</h3>
+<ul>
+<li>根据高度给每个多边形上色，那样峰值部将是红色（#ff0000），谷部将是蓝色（#0000ff）。</li>
+</ul>
+<pre><code class="language-go">\\ 练习<span class="hljs-number">3.3</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-keyword">const</span> (
+	width, height = <span class="hljs-number">600</span>, <span class="hljs-number">320</span>
+	cells         = <span class="hljs-number">100</span>
+	xyrange       = <span class="hljs-number">30.0</span>
+	xyscale       = width / <span class="hljs-number">2</span> / xyrange
+	zscale        = height * <span class="hljs-number">0.4</span>
+	angle         = math.Pi / <span class="hljs-number">6</span>
+)
+<span class="hljs-keyword">var</span> sin30 = math.Sin(angle) <span class="hljs-comment">// Go的常量是在编译之前就能确定的常量</span>
+<span class="hljs-keyword">var</span> cos30 = math.Cos(angle)
+
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	fmt.Printf(<span class="hljs-string">&quot;&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;style=&#x27;stroke: grey; fill: white; stroke-width: 0.7&#x27; &quot;</span>+
+        <span class="hljs-string">&quot;width=&#x27;%d&#x27; height=&#x27;%d&#x27;&gt;&quot;</span>, width, height)
+	<span class="hljs-keyword">for</span> i:= <span class="hljs-number">0</span>; i &lt; cells; i++ {
+		<span class="hljs-keyword">for</span> j := <span class="hljs-number">0</span>; j &lt; cells; j++ {
+			ax, ay, az := corner(i + <span class="hljs-number">1</span>, j)
+			bx, by, bz := corner(i, j)
+			cx, cy, cz := corner(i, j + <span class="hljs-number">1</span>)
+			dx, dy, dz := corner(i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>)
+			<span class="hljs-keyword">if</span> math.IsNaN(ax) || math.IsNaN(ay) || math.IsNaN(bx) || math.IsNaN(by) || math.IsNaN(cx) || math.IsNaN(cy) || math.IsNaN(dx) || math.IsNaN(dy) {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;NAN&quot;</span>)
+			} <span class="hljs-keyword">else</span> {
+				<span class="hljs-comment">//将z映射到一个较大范围</span>
+
+				fmt.Printf(<span class="hljs-string">&quot;&lt;polygon style=&#x27;fill: &quot;</span>)
+				
+				avgz := <span class="hljs-type">int</span>((az + bz + cz + dz) * <span class="hljs-number">10.0</span> + <span class="hljs-number">8.0</span>) * <span class="hljs-number">18</span>
+				
+				redv, bluev := <span class="hljs-number">0</span>, <span class="hljs-number">0</span> 
+				<span class="hljs-keyword">if</span> avgz &lt;= <span class="hljs-number">255</span> {
+					redv = <span class="hljs-number">0</span>
+					bluev = <span class="hljs-number">255</span> - avgz
+				} <span class="hljs-keyword">else</span> {
+					redv = avgz - <span class="hljs-number">255</span>
+					bluev = <span class="hljs-number">0</span>
+				}
+				<span class="hljs-keyword">if</span> redv &gt; <span class="hljs-number">255</span> {
+					redv = <span class="hljs-number">255</span>
+				}
+				<span class="hljs-keyword">if</span> bluev &gt; <span class="hljs-number">255</span>{
+					bluev = <span class="hljs-number">255</span>
+				}
+				
+				fmt.Printf(<span class="hljs-string">&quot;#%02X00&quot;</span>, redv)
+				fmt.Printf(<span class="hljs-string">&quot;%02X&quot;</span>, bluev)	
+				fmt.Printf(<span class="hljs-string">&quot;&#x27; points=&#x27;%g,%g %g,%g %g,%g %g,%g&#x27;/&gt;\n&quot;</span>,ax, ay, bx, by, cx, cy, dx, dy)
+				
+			}
+		}
+	}
+	fmt.Println(<span class="hljs-string">&quot;&lt;/svg&gt;&quot;</span>)
+}
+$$
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">corner</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> (<span class="hljs-type">float64</span>, <span class="hljs-type">float64</span>, <span class="hljs-type">float64</span>) {
+    x := xyrange * (<span class="hljs-type">float64</span>(i)/cells - <span class="hljs-number">0.5</span>)
+    y := xyrange * (<span class="hljs-type">float64</span>(j)/cells - <span class="hljs-number">0.5</span>)
+
+    z := f(x, y)
+    sx := width/<span class="hljs-number">2</span> + (x-y)*cos30*xyscale
+    sy := height/<span class="hljs-number">2</span> + (x+y)*sin30*xyscale - z*zscale
+    <span class="hljs-keyword">return</span> sx, sy, z
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">f</span><span class="hljs-params">(x, y <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> {
+    r := math.Hypot(x, y) 
+    <span class="hljs-keyword">return</span> math.Sin(r) / r
+}
+</code></pre>
+<h3 id="练习34">练习3.4</h3>
+<ul>
+<li>参考1.7节Lissajous例子的函数，构造一个web服务器，用于计算函数曲面然后返回SVG数据给客户端。</li>
+<li>服务器必须设置Content-Type头部： <code>w.Header().Set(&quot;Content-Type&quot;, &quot;image/svg+xml&quot;)</code></li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 直接返回给浏览器</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+)
+
+<span class="hljs-keyword">const</span> (
+	width, height = <span class="hljs-number">600</span>, <span class="hljs-number">320</span>
+	cells         = <span class="hljs-number">100</span>
+	xyrange       = <span class="hljs-number">30.0</span>
+	xyscale       = width / <span class="hljs-number">2</span> / xyrange
+	zscale        = height * <span class="hljs-number">0.4</span>
+	angle         = math.Pi / <span class="hljs-number">6</span>
+)
+<span class="hljs-keyword">var</span> sin30 = math.Sin(angle) <span class="hljs-comment">// Go的常量是在编译之前就能确定的常量</span>
+<span class="hljs-keyword">var</span> cos30 = math.Cos(angle)
+
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+		w.Header().Set(<span class="hljs-string">&quot;Content-Type&quot;</span>, <span class="hljs-string">&quot;image/svg+xml&quot;</span>)
+		getXML(w)
+	}
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getXML</span><span class="hljs-params">(out io.Writer)</span></span>{
+	fmt.Fprintf(out, <span class="hljs-string">&quot;&lt;svg xmlns=&#x27;http://www.w3.org/2000/svg&#x27; &quot;</span>+
+	<span class="hljs-string">&quot;style=&#x27;stroke: grey; fill: white; stroke-width: 0.7&#x27; &quot;</span>+
+	<span class="hljs-string">&quot;width=&#x27;%d&#x27; height=&#x27;%d&#x27;&gt;&quot;</span>, width, height)
+	<span class="hljs-keyword">for</span> i:= <span class="hljs-number">0</span>; i &lt; cells; i++ {
+		<span class="hljs-keyword">for</span> j := <span class="hljs-number">0</span>; j &lt; cells; j++ {
+			ax, ay := corner(i + <span class="hljs-number">1</span>, j)
+			bx, by := corner(i, j)
+			cx, cy := corner(i, j + <span class="hljs-number">1</span>)
+			dx, dy := corner(i + <span class="hljs-number">1</span>, j + <span class="hljs-number">1</span>)
+			<span class="hljs-keyword">if</span> math.IsNaN(ax) || math.IsNaN(ay) || math.IsNaN(bx) || math.IsNaN(by) || math.IsNaN(cx) || math.IsNaN(cy) || math.IsNaN(dx) || math.IsNaN(dy) {
+				fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;NAN&quot;</span>)
+			} <span class="hljs-keyword">else</span> {
+				fmt.Fprintf(out, <span class="hljs-string">&quot;&lt;polygon points=&#x27;%g,%g %g,%g %g,%g %g,%g&#x27;/&gt;\n&quot;</span>,ax, ay, bx, by, cx, cy, dx, dy)
+			}
+		}
+	}
+	fmt.Fprintln(out, <span class="hljs-string">&quot;&lt;/svg&gt;&quot;</span>)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">corner</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> (<span class="hljs-type">float64</span>, <span class="hljs-type">float64</span>) {
+	x := xyrange * (<span class="hljs-type">float64</span>(i) / cells - <span class="hljs-number">0.5</span>)
+	y := xyrange * (<span class="hljs-type">float64</span>(j) / cells - <span class="hljs-number">0.5</span>)
+	z := f(x, y)
+	sx := width / <span class="hljs-number">2</span> + (x - y) * cos30 * xyscale
+	sy := height / <span class="hljs-number">2</span> + (x + y) * sin30 * xyscale - z * zscale
+	<span class="hljs-keyword">return</span> sx, sy
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">f</span><span class="hljs-params">(x, y <span class="hljs-type">float64</span>)</span></span> <span class="hljs-type">float64</span> {
+	r := math.Hypot(x, y)
+	<span class="hljs-keyword">return</span> math.Sin(r) / r
+}
+</code></pre>
+<h2 id="复数">复数</h2>
+<ul>
+<li>
+<p>附属包含complex64 和 complex128, 注意分别对应的是float32 和 float64 是两倍的关系</p>
+</li>
+<li>
+<p>Mandelbrot图像， 对每个点进行<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mrow><mi>k</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msubsup><mi>z</mi><mi>k</mi><mn>2</mn></msubsup><mo>+</mo><mi>c</mi></mrow><annotation encoding="application/x-tex">z_{k+1} = z^2_k + c</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0972em;vertical-align:-0.2831em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-2.4169em;margin-left:-0.044em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2831em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span>迭代测试， 迭代次数越多出范围的颜色越深形成的图形</p>
+</li>
+</ul>
+<pre><code class="language-go">\\ web示例
+<span class="hljs-comment">// png格式的mandelbrot 图像</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/png&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math/cmplx&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">const</span> (
+		xmin, ymin, xmax, ymax = <span class="hljs-number">-2</span>, <span class="hljs-number">-2</span>,  <span class="hljs-number">2</span>, <span class="hljs-number">2</span>
+		width, height = <span class="hljs-number">1024</span>, <span class="hljs-number">1024</span>
+	)
+	img := image.NewRGBA(image.Rect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,width, height))
+	<span class="hljs-keyword">for</span> py := <span class="hljs-number">0</span>; py &lt; height; py++ {
+		y := <span class="hljs-type">float64</span>(py) / height * (ymax - ymin) + ymin
+		<span class="hljs-keyword">for</span> px := <span class="hljs-number">0</span>; px &lt; width; px++ {
+			x := <span class="hljs-type">float64</span>(px) / width * (xmax - xmin) + xmin 
+			z := <span class="hljs-built_in">complex</span>(x, y)
+			img.Set(px, py, mandelbrot(z))
+		}
+	}
+	handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+		png.Encode(w, img)
+	}
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">mandelbrot</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> color.Color{
+	<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">200</span>
+	<span class="hljs-keyword">const</span> contrast = <span class="hljs-number">15</span>
+	<span class="hljs-keyword">var</span> v <span class="hljs-type">complex128</span> 
+	<span class="hljs-keyword">for</span> n := <span class="hljs-type">uint8</span>(<span class="hljs-number">0</span>); n &lt; iterations; n++ {
+		v = v * v + z
+		<span class="hljs-keyword">if</span> cmplx.Abs(v) &gt; <span class="hljs-number">2</span> {
+			<span class="hljs-keyword">return</span> color.Gray{<span class="hljs-number">255</span> - contrast * n}
+		}
+	}
+	<span class="hljs-keyword">return</span> color.Black
+}
+
+</code></pre>
+<h3 id="练习35">练习3.5</h3>
+<ul>
+<li>实现一个彩色的Mandelbrot图像，使用image.NewRGBA创建图像，使用color.RGBA或color.YCbCr生成颜色。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 随便调调参， 颜色还挺好看</span>
+<span class="hljs-comment">// 练习3.5 实现彩色效果</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/png&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math/cmplx&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">const</span> (
+		xmin, ymin, xmax, ymax = <span class="hljs-number">-2</span>, <span class="hljs-number">-2</span>,  <span class="hljs-number">2</span>, <span class="hljs-number">2</span>
+		width, height = <span class="hljs-number">1024</span>, <span class="hljs-number">1024</span>
+	)
+	img := image.NewRGBA(image.Rect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,width, height))
+	<span class="hljs-keyword">for</span> py := <span class="hljs-number">0</span>; py &lt; height; py++ {
+		y := <span class="hljs-type">float64</span>(py) / height * (ymax - ymin) + ymin
+		<span class="hljs-keyword">for</span> px := <span class="hljs-number">0</span>; px &lt; width; px++ {
+			x := <span class="hljs-type">float64</span>(px) / width * (xmax - xmin) + xmin 
+			z := <span class="hljs-built_in">complex</span>(x, y)
+			img.Set(px, py, mandelbrot(z))
+		}
+	}
+	handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+		png.Encode(w, img)
+	}
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">mandelbrot</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> color.Color{
+	<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">200</span>
+	<span class="hljs-keyword">const</span> contrast = <span class="hljs-number">15</span>
+	<span class="hljs-keyword">var</span> v <span class="hljs-type">complex128</span> 
+	<span class="hljs-keyword">for</span> n := <span class="hljs-type">uint8</span>(<span class="hljs-number">0</span>); n &lt; iterations; n++ {
+		v = v * v + z
+		<span class="hljs-keyword">if</span> cmplx.Abs(v) &gt; <span class="hljs-number">2</span> {
+			<span class="hljs-keyword">return</span> color.RGBA{<span class="hljs-number">50</span>, <span class="hljs-number">100</span>, <span class="hljs-number">100</span> + n, <span class="hljs-number">255</span> - contrast * n} <span class="hljs-comment">// 生成RGB效果</span>
+		}
+	}
+	<span class="hljs-keyword">return</span> color.RGBA{<span class="hljs-number">200</span>, <span class="hljs-number">200</span>, <span class="hljs-number">100</span>, <span class="hljs-number">0</span>}
+}
+
+</code></pre>
+<h3 id="练习36">练习3.6</h3>
+<ul>
+<li>升采样技术可以降低每个像素对计算颜色值和平均值的影响。简单的方法是将每个像素分成四个子像素，实现它。</li>
+<li>升采样技术， 这里要求分成四个像素， 已知本来像素的中心点和宽度， 计算其他四个中心点其实不难， 结果取个平均值</li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 练习3.6</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/png&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math/cmplx&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">const</span> (
+		xmin, ymin, xmax, ymax = <span class="hljs-number">-2</span>, <span class="hljs-number">-2</span>,  <span class="hljs-number">2</span>, <span class="hljs-number">2</span>
+		width, height = <span class="hljs-number">1024</span>, <span class="hljs-number">1024</span>
+	)
+	img := image.NewRGBA(image.Rect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,width, height))
+	<span class="hljs-keyword">for</span> py := <span class="hljs-number">0</span>; py &lt; height; py++ {
+		y := <span class="hljs-type">float64</span>(py) / height * (ymax - ymin) + ymin
+		<span class="hljs-keyword">for</span> px := <span class="hljs-number">0</span>; px &lt; width; px++ {
+			x := <span class="hljs-type">float64</span>(px) / width * (xmax - xmin) + xmin 
+
+			xn := []<span class="hljs-type">float64</span>{x - (xmax - xmin) / width / <span class="hljs-number">4</span>, x + (xmax - xmin) / width / <span class="hljs-number">4</span>}
+			yn := []<span class="hljs-type">float64</span>{y - (ymax - ymin) / height / <span class="hljs-number">4</span>, y + (ymax - ymin) / height / <span class="hljs-number">4</span>}
+			<span class="hljs-keyword">var</span> rnow, gnow, bnow, anow <span class="hljs-type">uint32</span> <span class="hljs-comment">// 因为有相加操作， 所以要大一点</span>
+			<span class="hljs-comment">//fmt.Fprintf(os.Stderr, &quot;%g\n&quot;, xn[0])</span>
+			<span class="hljs-keyword">for</span> _, xnow := <span class="hljs-keyword">range</span> xn {
+				<span class="hljs-keyword">for</span> _, ynow := <span class="hljs-keyword">range</span> yn {
+					rtmp, gtmp, btmp, atmp := mandelbrot(<span class="hljs-built_in">complex</span>(xnow, ynow)).RGBA()
+					<span class="hljs-comment">//fmt.Fprintf(os.Stderr, &quot;%d\n&quot;, atmp)</span>
+					rnow += rtmp &gt;&gt; <span class="hljs-number">8</span>
+					gnow += gtmp &gt;&gt; <span class="hljs-number">8</span>
+					bnow += btmp &gt;&gt; <span class="hljs-number">8</span>
+					anow += atmp &gt;&gt; <span class="hljs-number">8</span>
+				}
+			}
+			rnow /= <span class="hljs-number">4</span>
+			gnow /= <span class="hljs-number">4</span>
+			bnow /= <span class="hljs-number">4</span>
+			anow /= <span class="hljs-number">4</span>
+			<span class="hljs-comment">//fmt.Fprintf(os.Stderr, &quot;%d\n&quot;, anow)</span>
+			img.SetRGBA(px, py, color.RGBA{<span class="hljs-type">uint8</span>(rnow), <span class="hljs-type">uint8</span>(gnow), <span class="hljs-type">uint8</span>(bnow), <span class="hljs-type">uint8</span>(anow)})
+		}
+	}
+	handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+		png.Encode(w, img)
+	}
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">mandelbrot</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> color.Color{
+	<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">200</span>
+	<span class="hljs-keyword">const</span> contrast = <span class="hljs-number">15</span>
+	<span class="hljs-keyword">var</span> v <span class="hljs-type">complex128</span> 
+	<span class="hljs-keyword">for</span> n := <span class="hljs-type">uint8</span>(<span class="hljs-number">0</span>); n &lt; iterations; n++ {
+		v = v * v + z
+		<span class="hljs-keyword">if</span> cmplx.Abs(v) &gt; <span class="hljs-number">2</span> {
+			<span class="hljs-keyword">return</span> color.Gray{<span class="hljs-number">255</span> - contrast * n}
+		}
+	}
+	<span class="hljs-keyword">return</span> color.Black
+}
+
+</code></pre>
+<h3 id="练习37">练习3.7</h3>
+<ul>
+<li>另一个生成分形图像的方式是使用牛顿法来求解一个复数方程，例如<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>z</mi><mn>4</mn></msup><mo>−</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z^4-1=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>。每个起点到四个根的迭代次数对应阴影的灰度。方程根对应的点用颜色表示。</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>z</mi><mn>4</mn></msup><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">f(z) = z^4-1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8974em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">4</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, 已知幂函数为解析函数， 故 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>f</mi><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msup><mo stretchy="false">(</mo><mi>z</mi><mo stretchy="false">)</mo><mo>=</mo><mn>4</mn><msup><mi>z</mi><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">f&#x27;(z) = 4z^3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">4</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.04398em;">z</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span></li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 练习3.7</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/png&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math/cmplx&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">const</span> (
+		xmin, ymin, xmax, ymax = <span class="hljs-number">-2</span>, <span class="hljs-number">-2</span>,  <span class="hljs-number">2</span>, <span class="hljs-number">2</span>
+		width, height = <span class="hljs-number">1024</span>, <span class="hljs-number">1024</span>
+	)
+	img := image.NewRGBA(image.Rect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,width, height))
+	<span class="hljs-keyword">for</span> py := <span class="hljs-number">0</span>; py &lt; height; py++ {
+		y := <span class="hljs-type">float64</span>(py) / height * (ymax - ymin) + ymin
+		<span class="hljs-keyword">for</span> px := <span class="hljs-number">0</span>; px &lt; width; px++ {
+			x := <span class="hljs-type">float64</span>(px) / width * (xmax - xmin) + xmin 
+			z := <span class="hljs-built_in">complex</span>(x, y)
+			img.Set(px, py, newton(z))
+		}
+	}
+	handler := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span> {
+		png.Encode(w, img)
+	}
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, handler)
+		log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newton</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> color.Color{ <span class="hljs-comment">// x_{i + 1} = x_i - f(x) / f&#x27;(x)</span>
+	<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">200</span>
+	<span class="hljs-keyword">const</span> contrast = <span class="hljs-number">15</span>
+	<span class="hljs-keyword">var</span> v <span class="hljs-type">complex128</span> 
+	v = z
+	eps := <span class="hljs-number">1e-8</span>
+	ans1, ans2, ans3, ans4 := <span class="hljs-built_in">complex</span>(<span class="hljs-number">1</span>, <span class="hljs-number">0</span>), <span class="hljs-built_in">complex</span>(<span class="hljs-number">-1</span>, <span class="hljs-number">0</span>), <span class="hljs-built_in">complex</span>(<span class="hljs-number">0</span>, <span class="hljs-number">1</span>), <span class="hljs-built_in">complex</span>(<span class="hljs-number">0</span>, <span class="hljs-number">-1</span>)
+	<span class="hljs-keyword">for</span> n := <span class="hljs-type">uint8</span>(<span class="hljs-number">0</span>); n &lt; iterations; n++ {
+		v = v - f(v) / diff(v)
+		<span class="hljs-keyword">if</span> cmplx.Abs(v - ans1) &lt; eps || cmplx.Abs(v - ans2) &lt; eps || cmplx.Abs(v - ans3) &lt; eps || cmplx.Abs(v - ans4) &lt; eps {
+			<span class="hljs-keyword">return</span> color.Gray{<span class="hljs-number">255</span> - contrast * n}
+		}
+	}
+	<span class="hljs-keyword">return</span> color.Black
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">f</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> <span class="hljs-type">complex128</span> {
+	<span class="hljs-keyword">return</span> z * z * z * z - <span class="hljs-built_in">complex</span>(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">diff</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> <span class="hljs-type">complex128</span> {
+	<span class="hljs-keyword">return</span> <span class="hljs-number">4</span> * z * z * z 
+}
+</code></pre>
+<h3 id="练习38">练习3.8</h3>
+<ul>
+<li>通过提高精度来生成更多级别的分形。使用四种不同精度类型的数字实现相同的分形：complex64、complex128、big.Float和big.Rat。（后面两种类型在math/big包声明。Float是有指定限精度的浮点数；Rat是无限精度的有理数。）它们间的性能和内存使用对比如何？当渲染图可见时缩放的级别是多少？</li>
+</ul>
+<h3 id="练习39">练习3.9</h3>
+<ul>
+<li>编写一个web服务器，用于给客户端生成分形的图像。运行客户端通过HTTP参数指定x、y和zoom参数。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 实现http传参， 先处理参数再绘制</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;image&quot;</span>
+	<span class="hljs-string">&quot;image/color&quot;</span>
+	<span class="hljs-string">&quot;image/png&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;math/cmplx&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;strconv&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">const</span> (
+	<span class="hljs-comment">//	xmin, ymin, xmax, ymax = -2, -2,  2, 2</span>
+		width, height = <span class="hljs-number">1024</span>, <span class="hljs-number">1024</span>
+	)
+	params := <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>] <span class="hljs-type">float64</span> { <span class="hljs-comment">// 使用map直接存， 要是在之后使用多个if判断， 耗时反而会更久</span>
+		<span class="hljs-string">&quot;xmin&quot;</span>: <span class="hljs-number">-2</span>, 
+		<span class="hljs-string">&quot;xmax&quot;</span>: <span class="hljs-number">2</span>,
+		<span class="hljs-string">&quot;ymin&quot;</span>: <span class="hljs-number">-2</span>,
+		<span class="hljs-string">&quot;ymax&quot;</span>: <span class="hljs-number">2</span>,
+		<span class="hljs-string">&quot;zoom&quot;</span>: <span class="hljs-number">1</span>,
+	}
+
+	http.HandleFunc(<span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(w http.ResponseWriter, r *http.Request)</span></span>{
+			<span class="hljs-keyword">for</span> name := <span class="hljs-keyword">range</span> params {
+				s := r.FormValue(name)
+				<span class="hljs-keyword">if</span> s == <span class="hljs-string">&quot;&quot;</span> {
+					<span class="hljs-keyword">continue</span>
+				}
+				f, err := strconv.ParseFloat(s, <span class="hljs-number">64</span>)
+				<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+					http.Error(w, fmt.Sprintf(<span class="hljs-string">&quot;query param %s: %s&quot;</span>, name, err), http.StatusBadRequest)
+					<span class="hljs-keyword">return</span>
+				}
+				params[name] = f  <span class="hljs-comment">// 读取信息的方式， 来自Gopl-homework</span>
+			}
+			<span class="hljs-keyword">if</span> params[<span class="hljs-string">&quot;xmax&quot;</span>] &lt;= params[<span class="hljs-string">&quot;xmin&quot;</span>] || params[<span class="hljs-string">&quot;ymax&quot;</span>] &lt;= params[<span class="hljs-string">&quot;ymin&quot;</span>] {
+				http.Error(w, fmt.Sprintf(<span class="hljs-string">&quot;min coordinate greater than max&quot;</span>), http.StatusBadRequest)
+					<span class="hljs-keyword">return</span> 
+			}
+			xmin, xmax, ymin, ymax, zoom := params[<span class="hljs-string">&quot;xmin&quot;</span>],params[<span class="hljs-string">&quot;xmax&quot;</span>],params[<span class="hljs-string">&quot;ymin&quot;</span>],params[<span class="hljs-string">&quot;ymax&quot;</span>],params[<span class="hljs-string">&quot;zoom&quot;</span>]
+			lenX, lenY := xmax - xmin, ymax - ymin
+			midX, midY := xmin + lenX / <span class="hljs-number">2</span>, ymin + lenY / <span class="hljs-number">2</span>
+			xmin, xmax, ymin, ymax = midX - lenX / <span class="hljs-number">2</span> / zoom, midX + lenX / zoom / <span class="hljs-number">2</span>, midY - lenY / <span class="hljs-number">2</span> / zoom, midY + lenY / <span class="hljs-number">2</span> / zoom
+			<span class="hljs-comment">//fmt.Fprintf(os.Stderr, &quot;%g %g %g %g\n&quot;, xmin, xmax, ymin, ymax)</span>
+			img := image.NewRGBA(image.Rect(<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,width, height))
+			<span class="hljs-keyword">for</span> py := <span class="hljs-number">0</span>; py &lt; height; py++ {
+				y := <span class="hljs-type">float64</span>(py) / height * (ymax - ymin) + ymin
+				<span class="hljs-keyword">for</span> px := <span class="hljs-number">0</span>; px &lt; width; px++ {
+					x := <span class="hljs-type">float64</span>(px) / width * (xmax - xmin) + xmin 
+					z := <span class="hljs-built_in">complex</span>(x, y)
+					img.Set(px, py, mandelbrot(z))
+				}
+			}
+			png.Encode(w, img)
+	})
+	log.Fatal(http.ListenAndServe(<span class="hljs-string">&quot;localhost:8000&quot;</span>, <span class="hljs-literal">nil</span>))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">mandelbrot</span><span class="hljs-params">(z <span class="hljs-type">complex128</span>)</span></span> color.Color{
+	<span class="hljs-keyword">const</span> iterations = <span class="hljs-number">200</span>
+	<span class="hljs-keyword">const</span> contrast = <span class="hljs-number">15</span>
+	<span class="hljs-keyword">var</span> v <span class="hljs-type">complex128</span> 
+	<span class="hljs-keyword">for</span> n := <span class="hljs-type">uint8</span>(<span class="hljs-number">0</span>); n &lt; iterations; n++ {
+		v = v * v + z
+		<span class="hljs-keyword">if</span> cmplx.Abs(v) &gt; <span class="hljs-number">2</span> {
+			<span class="hljs-keyword">return</span> color.Gray{<span class="hljs-number">255</span> - contrast * n}
+		}
+	}
+	<span class="hljs-keyword">return</span> color.Black
+}
+</code></pre>
+<ul>
+<li>Go 同C含有表达式短路机制</li>
+</ul>
+<h2 id="字符串">字符串</h2>
+<ul>
+<li>
+<p>首先 Go中的字符串是不允许被修改的</p>
+</li>
+<li>
+<p>字符串S[i]表示读第i个字节， 并不一定是第i个字符</p>
+</li>
+<li>
+<p>Unicode 编码标准优良， 可以不用解码检查前后缀</p>
+</li>
+<li>
+<p>在程序内部使用rune序列可以更加方便， 大小一致， 便于切割</p>
+</li>
+<li>
+<p>书上的示例</p>
+</li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 三个示例写一个文件里了</span>
+
+<span class="hljs-comment">// 将看起来像是 系统目录的前缀删除， 并将看起来像后缀名的部分删除</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">basename</span> <span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">for</span> i := <span class="hljs-built_in">len</span>(s); i &gt;= <span class="hljs-number">0</span>; i-- {
+		<span class="hljs-keyword">if</span> s[i] == <span class="hljs-string">&#x27;/&#x27;</span> {
+			s = s[i + <span class="hljs-number">1</span>: ]
+			<span class="hljs-keyword">break</span>
+		}
+	}
+	<span class="hljs-keyword">for</span> i := <span class="hljs-built_in">len</span>(s) - <span class="hljs-number">1</span>; i &gt;= <span class="hljs-number">0</span>; i-- {
+		<span class="hljs-keyword">if</span> s[i] == <span class="hljs-string">&#x27;.&#x27;</span> {
+			s = s[:i]
+			<span class="hljs-keyword">break</span>
+		}
+	}
+	<span class="hljs-keyword">return</span> s
+}
+
+<span class="hljs-comment">// 使用strings.LastIndex </span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">basename1</span> <span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	slash := strings.LastIndex(s, <span class="hljs-string">&quot;/&quot;</span>)
+	s = s[slash + <span class="hljs-number">1</span>:]
+	<span class="hljs-keyword">if</span> dot := strings.LastIndex(s, <span class="hljs-string">&quot;.&quot;</span>); dot &gt;= <span class="hljs-number">0</span> {
+		s = s[:dot]
+	} 
+	<span class="hljs-keyword">return</span> s
+}
+
+<span class="hljs-comment">// comma </span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">comma</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	n := <span class="hljs-built_in">len</span>(s)
+	<span class="hljs-keyword">if</span> n &lt;= <span class="hljs-number">3</span> {
+		<span class="hljs-keyword">return</span> s
+	}
+	<span class="hljs-keyword">return</span> comma(s[:n - <span class="hljs-number">3</span>] + <span class="hljs-string">&quot;,&quot;</span> + s[n - <span class="hljs-number">3</span>:])
+}
+
+</code></pre>
+<h3 id="练习310">练习3.10</h3>
+<ul>
+<li>编写一个非递归版本的comma函数，使用bytes.Buffer代替字符串链接操作。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 实现非递归版本的comma函数</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;bytes&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> _, s := <span class="hljs-keyword">range</span> []<span class="hljs-type">string</span>{<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;12&quot;</span>, <span class="hljs-string">&quot;123&quot;</span>, <span class="hljs-string">&quot;1234&quot;</span>, <span class="hljs-string">&quot;12345678901234&quot;</span>, <span class="hljs-string">&quot;123456789012345&quot;</span>, <span class="hljs-string">&quot;1234567890123456&quot;</span>, <span class="hljs-string">&quot;12345678901234567&quot;</span>, <span class="hljs-string">&quot;123456789012345678&quot;</span>, <span class="hljs-string">&quot;1234567890123456789&quot;</span>} {
+		<span class="hljs-built_in">println</span>(comma(s))
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">comma</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">var</span> buf bytes.Buffer
+	<span class="hljs-built_in">len</span> := <span class="hljs-built_in">len</span>(s)
+	mod1 := <span class="hljs-built_in">len</span> % <span class="hljs-number">3</span>
+	<span class="hljs-keyword">if</span> mod1 == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">len</span> &gt;= <span class="hljs-number">3</span> {
+		mod1 = <span class="hljs-number">3</span>
+	}
+	<span class="hljs-keyword">for</span> be := <span class="hljs-number">0</span>; be + mod1 &lt;= <span class="hljs-built_in">len</span> ;{
+		buf.WriteString(s[be:be+mod1])
+		<span class="hljs-keyword">if</span> be + mod1 != <span class="hljs-built_in">len</span> {
+			buf.WriteString(<span class="hljs-string">&quot;,&quot;</span>)
+		}
+		be += mod1
+		mod1 = <span class="hljs-number">3</span>
+	}
+
+	<span class="hljs-keyword">return</span> buf.String()
+}
+</code></pre>
+<h2 id="练习311">练习3.11</h2>
+<ul>
+<li>完善comma函数，以支持浮点数处理和一个可选的正负号的处理。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 实现非递归版本的comma函数</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;bytes&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> _, s := <span class="hljs-keyword">range</span> []<span class="hljs-type">string</span>{<span class="hljs-string">&quot;1&quot;</span>, <span class="hljs-string">&quot;12&quot;</span>, <span class="hljs-string">&quot;123&quot;</span>, <span class="hljs-string">&quot;1234&quot;</span>, <span class="hljs-string">&quot;12345678.901234&quot;</span>, <span class="hljs-string">&quot;-123456789012.345&quot;</span>, <span class="hljs-string">&quot;123456789012.3456&quot;</span>, <span class="hljs-string">&quot;123456789012345.67&quot;</span>, <span class="hljs-string">&quot;12345678901234567.8&quot;</span>, <span class="hljs-string">&quot;12.34567890123456789&quot;</span>} {
+		<span class="hljs-built_in">println</span>(comma(s))
+	}
+}
+
+<span class="hljs-comment">// 更改后的comma 函数支持将浮点数, 小数部分是从左往右</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">comma</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">var</span> buf bytes.Buffer
+	<span class="hljs-built_in">len</span> := <span class="hljs-built_in">len</span>(s)
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span> &gt; <span class="hljs-number">0</span> &amp;&amp; s[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;-&#x27;</span> {
+		buf.WriteByte(<span class="hljs-string">&#x27;-&#x27;</span>)
+		s = s[<span class="hljs-number">1</span>:]
+	}
+	dotPlace := strings.IndexByte(s, <span class="hljs-string">&#x27;.&#x27;</span>) 
+	<span class="hljs-keyword">if</span> dotPlace &gt; <span class="hljs-number">0</span> {
+		buf.WriteString(comma1(s[:dotPlace]))
+		buf.WriteByte(<span class="hljs-string">&#x27;.&#x27;</span>)
+		buf.WriteString(comma2(s[dotPlace + <span class="hljs-number">1</span>:]))
+	} <span class="hljs-keyword">else</span> {
+		buf.WriteString(comma1(s))
+	}
+	<span class="hljs-keyword">return</span> buf.String()
+}
+<span class="hljs-comment">// 整数部分</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">comma1</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">var</span> buf bytes.Buffer
+	<span class="hljs-built_in">len</span> := <span class="hljs-built_in">len</span>(s)
+	mod1 := <span class="hljs-built_in">len</span> % <span class="hljs-number">3</span>
+	<span class="hljs-keyword">if</span> mod1 == <span class="hljs-number">0</span> &amp;&amp; <span class="hljs-built_in">len</span> &gt;= <span class="hljs-number">3</span> {
+		mod1 = <span class="hljs-number">3</span>
+	}
+	<span class="hljs-keyword">for</span> be := <span class="hljs-number">0</span>; be + mod1 &lt;= <span class="hljs-built_in">len</span> ;{
+		buf.WriteString(s[be:be+mod1])
+		<span class="hljs-keyword">if</span> be + mod1 != <span class="hljs-built_in">len</span> {
+			buf.WriteString(<span class="hljs-string">&quot;,&quot;</span>)
+		}
+		be += mod1
+		mod1 = <span class="hljs-number">3</span>
+	}
+	<span class="hljs-keyword">return</span> buf.String()
+}
+<span class="hljs-comment">// 小数部分</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">comma2</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">var</span> buf bytes.Buffer
+	<span class="hljs-built_in">len</span> := <span class="hljs-built_in">len</span>(s)
+	
+	<span class="hljs-keyword">for</span> be := <span class="hljs-number">0</span>; be &lt; <span class="hljs-built_in">len</span> ; be += <span class="hljs-number">3</span>{
+		<span class="hljs-keyword">if</span> be + <span class="hljs-number">3</span> &lt; <span class="hljs-built_in">len</span> {
+			buf.WriteString(s[be:be+<span class="hljs-number">3</span>])
+			buf.WriteString(<span class="hljs-string">&quot;,&quot;</span>)
+		} <span class="hljs-keyword">else</span> {
+			buf.WriteString(s[be:])
+		}
+	}
+	<span class="hljs-keyword">return</span> buf.String()
+}
+</code></pre>
+<h3 id="练习312">练习3.12</h3>
+<ul>
+<li>编写一个函数，判断两个字符串是否是相互打乱的，也就是说它们有着相同的字符，但是对应不同的顺序。</li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 使用两个map记录两个字符串字符出现次数</span>
+<span class="hljs-comment">// </span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	s1, s2 := <span class="hljs-string">&quot;abc&quot;</span>, <span class="hljs-string">&quot;cba&quot;</span>
+	fmt.Println(cmp(s1, s2))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">cmp</span><span class="hljs-params">(s1, s2 <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">bool</span> {
+	<span class="hljs-keyword">if</span> s1 == s2{
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> 
+	}
+	m1, m2 := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>), <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(s1); i++ {
+		m1[<span class="hljs-type">string</span>(s1[i])]++
+	}
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(s2); i++ {
+		m2[<span class="hljs-type">string</span>(s2[i])]++
+	}
+	<span class="hljs-keyword">for</span> k, v := <span class="hljs-keyword">range</span> m1 {
+		<span class="hljs-keyword">if</span> m2[k] != v {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+		}
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+}
+</code></pre>
+<h2 id="常量">常量</h2>
+<h3 id="iota-常量生成器">iota 常量生成器</h3>
+<ul>
+<li>iota 常量生成器， 可以在常量声明中用iota作为常量值， 它会自增， 从0开始</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">type</span> Weekday <span class="hljs-type">int</span>
+
+<span class="hljs-keyword">const</span> (
+    Sunday Weekday = <span class="hljs-literal">iota</span>
+    Monday
+    Tuesday
+    Wednesday
+    Thursday
+    Friday
+    Saturday
+)
+</code></pre>
+<ul>
+<li>常量可以表示为无类型的</li>
+</ul>
+<h3 id="练习313">练习3.13</h3>
+<ul>
+<li>编写KB、MB的常量声明，然后扩展到YB。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 练习3.13 编写KB、MB的常量声明，然后扩展到YB。</span>
+<span class="hljs-comment">// 拆分二进制</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">const</span> (
+		KB = <span class="hljs-number">1000</span>
+		MB = <span class="hljs-number">1000</span> * KB
+		GB = <span class="hljs-number">1000</span> * MB
+		TB = <span class="hljs-number">1000</span> * GB
+		PB = <span class="hljs-number">1000</span> * TB
+		EB = <span class="hljs-number">1000</span> * PB
+		ZB = <span class="hljs-number">1000</span> * EB
+		YB = <span class="hljs-number">1000</span> * ZB
+	)
+	<span class="hljs-comment">//fmt.Println(KB, MB, GB, TB, PB, EB, ZB,YB)</span>
+}
+
+</code></pre>
+<h1 id="第四章">第四章</h1>
+<h2 id="数组">数组</h2>
+<ul>
+<li>默认情况下，数组的每个元素都被初始化为元素类型对应的0值。</li>
+<li>示例</li>
+</ul>
+<pre><code class="language-go">
+q := [<span class="hljs-number">3</span>]<span class="hljs-type">int</span>{<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>}
+
+<span class="hljs-keyword">type</span> Currency <span class="hljs-type">int</span>
+<span class="hljs-keyword">const</span> (
+	USD Currency = <span class="hljs-literal">iota</span>
+	EUR
+	GBP
+	RMB
+)
+symbol := [<span class="hljs-number">4</span>]<span class="hljs-type">string</span>{USD: <span class="hljs-string">&quot;$&quot;</span>, EUR: <span class="hljs-string">&quot;€&quot;</span>, GBP: <span class="hljs-string">&quot;£&quot;</span>, RMB: <span class="hljs-string">&quot;¥&quot;</span>}
+fmt.Println(RMB, symbol[RMB])
+
+
+</code></pre>
+<ul>
+<li>数组比较时， 只有各元素都可比较且一致时， 才认为数组相等</li>
+<li>这里有个数组比较的例子</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;crypto/sha256&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	c1 := sha256.Sum256([]<span class="hljs-type">byte</span>(<span class="hljs-string">&quot;x&quot;</span>))
+	c2 := sha256.Sum256([]<span class="hljs-type">byte</span>(<span class="hljs-string">&quot;X&quot;</span>))
+	fmt.Printf(<span class="hljs-string">&quot;%x\n%x\n%t\n%T\n&quot;</span>, c1, c2, c1 == c2, c1)
+}
+</code></pre>
+<h3 id="练习41">练习4.1</h3>
+<ul>
+<li>编写一个函数，计算两个SHA256哈希码中不同bit的数目。（参考2.6.2节的PopCount函数。)</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;crypto/sha256&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> pc [<span class="hljs-number">256</span>]<span class="hljs-type">byte</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">init</span><span class="hljs-params">()</span></span> {
+    <span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> pc {
+        pc[i] = pc[i/<span class="hljs-number">2</span>] + <span class="hljs-type">byte</span>(i&amp;<span class="hljs-number">1</span>)
+    }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	c1 := sha256.Sum256([]<span class="hljs-type">byte</span>(<span class="hljs-string">&quot;x&quot;</span>))
+	c2 := sha256.Sum256([]<span class="hljs-type">byte</span>(<span class="hljs-string">&quot;X&quot;</span>))
+	ans := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-built_in">len</span>(c1); i++ {
+		ans += <span class="hljs-type">int</span>(pc[c1[i]^c2[i]])
+	}
+	fmt.Println(ans)
+}
+</code></pre>
+<h3 id="练习42">练习4.2</h3>
+<ul>
+<li>编写一个程序，默认情况下打印标准输入的SHA256编码，并支持通过命令行flag定制，输出SHA384或SHA512哈希算法。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">//编写一个程序，默认情况下打印标准输入的SHA256编码，并支持通过命令行flag定制，输出SHA384或SHA512哈希算法。</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;crypto/sha256&quot;</span>
+	<span class="hljs-string">&quot;crypto/sha512&quot;</span>
+	<span class="hljs-string">&quot;flag&quot;</span>
+	<span class="hljs-string">&quot;fmt&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> hashMethod = flag.Int(<span class="hljs-string">&quot;s&quot;</span>, <span class="hljs-number">256</span>, <span class="hljs-string">&quot;hash method default:256 other:384, 512&quot;</span>)
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	flag.Parse()
+	<span class="hljs-keyword">var</span> s <span class="hljs-type">string</span>
+	fmt.Printf(<span class="hljs-string">&quot;输入字符串&quot;</span>)
+	fmt.Scanln(&amp;s)
+	<span class="hljs-keyword">switch</span> *hashMethod{
+		<span class="hljs-keyword">case</span> <span class="hljs-number">256</span>:
+			fmt.Printf(<span class="hljs-string">&quot;%x 1\n&quot;</span>, sha256.Sum256([]<span class="hljs-type">byte</span>(s)))
+		<span class="hljs-keyword">case</span> <span class="hljs-number">384</span>:
+			fmt.Printf(<span class="hljs-string">&quot;%x 2\n&quot;</span>, sha512.Sum384([]<span class="hljs-type">byte</span>(s)))
+		<span class="hljs-keyword">case</span> <span class="hljs-number">512</span>:
+			fmt.Printf(<span class="hljs-string">&quot;%x 3\n&quot;</span>, sha512.Sum512([]<span class="hljs-type">byte</span>(s)))
+		<span class="hljs-keyword">default</span>:
+			fmt.Printf(<span class="hljs-string">&quot;输入错误&quot;</span>u
+}
+</code></pre>
+<h2 id="slice">Slice</h2>
+<h3 id="共通点">共通点</h3>
+<ul>
+<li>语法相近,slice只是没有固定长度。</li>
+</ul>
+<h3 id="区别">区别</h3>
+<ul>
+<li>slice的第一个元素不一定是数组的第一个元素。</li>
+<li>slice的容量是指从slice开始地址到数组结束地址的距离。 使用cap函数可以获取slice的容量。</li>
+<li>slice的容量和长度可以不一样。多个slice可以指向同一个数组。</li>
+<li>slice不能直接判断是否相等，但是可以通过比较其长度和元素是否相等来判断。</li>
+<li></li>
+</ul>
+<pre><code>
+</code></pre>
+<h1 id="第五章">第五章</h1>
+<ul>
+<li>函数的四种写法——你懂么?</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">add</span><span class="hljs-params">(x <span class="hljs-type">int</span>, y <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {<span class="hljs-keyword">return</span> x + y}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sub</span><span class="hljs-params">(x, y <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {<span class="hljs-keyword">return</span> x - y})
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">first</span><span class="hljs-params">(x <span class="hljs-type">int</span>, _ <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {<span class="hljs-keyword">return</span> x}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">zero</span><span class="hljs-params">(<span class="hljs-type">int</span>, <span class="hljs-type">int</span> )</span></span> <span class="hljs-type">int</span> {<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>}
+
+
+</code></pre>
+<ul>
+<li>函数的类型被称为函数的签名， 由两个部分，参数列表和返回值列表决定。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Sin</span><span class="hljs-params">(x <span class="hljs-type">float64</span>)</span></span> float <span class="hljs-comment">// 该函数没有函数体， 为函数声明，表示功能不是由GO实现的， 定义了函数签名（可能是汇编语言）</span>
+</code></pre>
+<ul>
+<li>遍历dom树的递归函数</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 遍历dom树查找herf</span>
+<span class="hljs-comment">// 遍历dom树查找herf</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin)  <span class="hljs-comment">// html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer</span>
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">for</span> _, link := <span class="hljs-keyword">range</span> visit(<span class="hljs-literal">nil</span>, doc) { <span class="hljs-comment">// </span>
+		fmt.Println(link)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []<span class="hljs-type">string</span>, n *html.Node)</span></span> []<span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;a&quot;</span> {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;href&quot;</span> {
+				links = <span class="hljs-built_in">append</span>(links, a.Val)
+			}
+		}
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		links = visit(links, c) <span class="hljs-comment">// 递归调用， </span>
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+
+</code></pre>
+<ul>
+<li>输出整个dom树结构，</li>
+</ul>
+<h3 id="练习51">练习5.1</h3>
+<ul>
+<li>修改findlinks代码中遍历n.FirstChild链表的部分，将循环调用visit，改成递归调用。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 递归子节点和兄弟节点</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	doc, err := html.Parse(os.Stdin)  
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">for</span> _, link := <span class="hljs-keyword">range</span> visit(<span class="hljs-literal">nil</span>, doc) { <span class="hljs-comment">// </span>
+		fmt.Println(link)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []<span class="hljs-type">string</span>, n *html.Node)</span></span> []<span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;a&quot;</span> {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;href&quot;</span> {
+				links = <span class="hljs-built_in">append</span>(links, a.Val)
+			}
+		}
+	}
+	<span class="hljs-keyword">if</span> n.FirstChild != <span class="hljs-literal">nil</span> {
+		links = visit(links, n.FirstChild)
+	}
+	<span class="hljs-keyword">if</span> n.NextSibling != <span class="hljs-literal">nil</span> {
+		links = visit(links, n.NextSibling)
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+
+</code></pre>
+<h3 id="练习52">练习5.2</h3>
+<ul>
+<li>编写函数，记录在HTML树中出现的同名元素的次数。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 编写函数，记录在HTML树中出现的同名元素的次数。</span>
+<span class="hljs-comment">// 同名元素是指 Node.Data 相同的， 使用map统计即可</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin)  <span class="hljs-comment">// html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer</span>
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">for</span> name, total := <span class="hljs-keyword">range</span> count(<span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>), doc) { <span class="hljs-comment">// </span>
+		fmt.Printf(<span class="hljs-string">&quot;%s, %d\n&quot;</span>, name, total)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">count</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>, n *html.Node)</span></span> <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>{
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode{
+		m[n.Data]++
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		count(m, c)
+	}
+	<span class="hljs-keyword">return</span> m
+}
+
+
+</code></pre>
+<h3 id="练习53">练习5.3</h3>
+<ul>
+<li>编写函数输出所有text结点的内容。注意不要访问<script>和<style>元素，因为这些元素对浏览者是不可见的。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// text节点判断方法—— 为html.text Node, 输出非英文有的是乱码</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin)  <span class="hljs-comment">// html.Parse 输入是io.Reader 常见来源有 os.Open, strings.NewReader, http.Request.body, bytes.Buffer</span>
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">for</span> _, link := <span class="hljs-keyword">range</span> visit(<span class="hljs-literal">nil</span>, doc) { <span class="hljs-comment">// </span>
+		fmt.Println(link)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []<span class="hljs-type">string</span>, n *html.Node)</span></span> []<span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> n.Type == html.TextNode  {
+		fmt.Println(n.Data)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		<span class="hljs-keyword">if</span> c.Data == <span class="hljs-string">&quot;style&quot;</span> || c.Data == <span class="hljs-string">&quot;script&quot;</span> {
+			<span class="hljs-keyword">continue</span>
+		}
+		links = visit(links, c) 
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+</code></pre>
+<h3 id="练习54">练习5.4</h3>
+<ul>
+<li>扩展visit函数，使其能够处理其他类型的结点，如images、scripts和style sheets。</li>
+<li></li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 扩展visit函数，使其能够处理其他类型的结点，如images、scripts和style sheets。</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	doc, err := html.Parse(os.Stdin)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">for</span> _, link := <span class="hljs-keyword">range</span> visit(<span class="hljs-literal">nil</span>, doc) { <span class="hljs-comment">// </span>
+		fmt.Println(link)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []<span class="hljs-type">string</span>, n *html.Node)</span></span> []<span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;a&quot;</span> {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;href&quot;</span> {
+				links = <span class="hljs-built_in">append</span>(links, a.Val)
+			}
+		}
+	}
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; (n.Data == <span class="hljs-string">&quot;img&quot;</span> || n.Data == <span class="hljs-string">&quot;script&quot;</span>) {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;src&quot;</span> {
+				links = <span class="hljs-built_in">append</span>(links, a.Val)
+			}
+		}
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		links = visit(links, c) <span class="hljs-comment">// 递归调用， </span>
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+
+</code></pre>
+<h2 id="多返回值">多返回值</h2>
+<ul>
+<li>多返回值可以做返回值</li>
+<li>多返回值函数可以做参数， 下面两种写法等同</li>
+</ul>
+<pre><code class="language-go">log.Println(findLinks(url))
+</code></pre>
+<pre><code class="language-go">links, err := findLinks(url)
+log.Println(links, err)
+</code></pre>
+<ul>
+<li>新版本findlinks</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 遍历dom树查找herf</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		links, err := findLinks(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlinks2: %v\n&quot;</span>, err)
+			<span class="hljs-keyword">continue</span>
+		}
+		<span class="hljs-keyword">for</span> _, link := <span class="hljs-keyword">range</span> links {
+			fmt.Println(link)
+		}
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">findLinks</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> ([]<span class="hljs-type">string</span>, <span class="hljs-type">error</span>) {
+	resp, err := http.Get(url)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err 
+	}
+	<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, fmt.Errorf(<span class="hljs-string">&quot;getting %s: %s&quot;</span>, url, resp.Status)
+	}
+	doc, err := html.Parse(resp.Body)
+	resp.Body.Close() <span class="hljs-comment">// Go的垃圾回收不包括</span>
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, err
+	}
+	<span class="hljs-keyword">return</span> visit(<span class="hljs-literal">nil</span>, doc), <span class="hljs-literal">nil</span> <span class="hljs-comment">// 返回值有好几种， </span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []<span class="hljs-type">string</span>, n *html.Node)</span></span> []<span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;a&quot;</span> {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;href&quot;</span> {
+				links = <span class="hljs-built_in">append</span>(links, a.Val)
+			}
+		}
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		links = visit(links, c) <span class="hljs-comment">// 递归调用， </span>
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+
+</code></pre>
+<ul>
+<li>如果一个函数的所有返回值都有显示的变量名， 那么该函数的return语句可以省略变量名。 bare return</li>
+</ul>
+<h2 id="练习56">练习5.6</h2>
+<ul>
+<li><a href="http://xn--gopl-486fx14i.io/ch3/surface%EF%BC%88%C2%A73.2%EF%BC%89%E4%B8%AD%E7%9A%84corner%E5%87%BD%E6%95%B0%EF%BC%8C%E5%B0%86%E8%BF%94%E5%9B%9E%E5%80%BC%E5%91%BD%E5%90%8D%EF%BC%8C%E5%B9%B6%E4%BD%BF%E7%94%A8bare">修改gopl.io/ch3/surface（§3.2）中的corner函数，将返回值命名，并使用bare</a> return。</li>
+<li></li>
+</ul>
+<pre><code class="language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">corner</span><span class="hljs-params">(i, j <span class="hljs-type">int</span>)</span></span> (sx <span class="hljs-type">float64</span>,sy <span class="hljs-type">float64</span>) {
+	x := xyrange * (<span class="hljs-type">float64</span>(i) / cells - <span class="hljs-number">0.5</span>)
+	y := xyrange * (<span class="hljs-type">float64</span>(j) / cells - <span class="hljs-number">0.5</span>)
+	z := f(x, y)
+	sx = width / <span class="hljs-number">2</span> + (x - y) * cos30 * xyscale
+	sy = height / <span class="hljs-number">2</span> + (x + y) * sin30 * xyscale - z * zscale
+	<span class="hljs-keyword">return</span> 
+}
+
+</code></pre>
+<h2 id="错误处理">错误处理</h2>
+<ul>
+<li>所有错误在本层分层时， 都需要添加本层的前缀， 错误信息</li>
+<li>错误一般分为五种</li>
+<li>传播错误， 错误会使得整个功能失败。 整个错误返回给调用者</li>
+<li>错误时偶然性，不可预知的问题产生。 重试时， 我们需要限制重试的时间间隔或者重试的次数， 避免无限制的重试 （例子：下面的wait函数）</li>
+<li>错误时整个程序无法运行、需要输出错误并且结束程序， 只应该在main中执行。</li>
+<li>错误时， 只需要输出错误， 不需要结束程序。  log.printf(&quot;message&quot;, error)</li>
+<li>直接忽略掉错误。</li>
+<li>文件结尾错误一般不需要报错</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">WaitForServer</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> {
+	<span class="hljs-keyword">const</span> timeout = <span class="hljs-number">1</span> * time.Minute
+	deadline := time.Now().Add(timeout)
+	<span class="hljs-keyword">for</span> tries := <span class="hljs-number">0</span>; time.Now().Before(deadline); tries++ {
+		_, err := http.Head(url)
+		<span class="hljs-keyword">if</span> err == <span class="hljs-literal">nil</span> {
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+		}
+		log.Printf(<span class="hljs-string">&quot;server not responding (%s); retrying...&quot;</span>, err)
+		time.Sleep(time.Second &lt;&lt; <span class="hljs-type">uint</span>(tries)) 
+	}
+	<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;server %s failed to respond after %s&quot;</span>, url, timeout)
+}
+</code></pre>
+<h2 id="函数变量">函数变量</h2>
+<ul>
+<li>Go语言中，函数也是值， 可以赋值给变量， 函数变量可以作为参数传递给其他函数</li>
+<li>例子</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">square</span><span class="hljs-params">(n <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> { <span class="hljs-keyword">return</span> n * n }
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">negative</span><span class="hljs-params">(n <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> { <span class="hljs-keyword">return</span> -n }
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">product</span><span class="hljs-params">(m, n <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> { <span class="hljs-keyword">return</span> m * n }
+f := square
+fmt.Println(f(<span class="hljs-number">3</span>))
+f = negative
+fmt.Println(f(<span class="hljs-number">3</span>))
+fmt.Printf(<span class="hljs-string">&quot;%T\n&quot;</span>, f))
+f = product <span class="hljs-comment">// 这里会报错， 因为两种函数不是同一类型（类型由参数列表和返回值列表决定）</span>
+</code></pre>
+<ul>
+<li>
+<p>%*s 会在字符串之前填充一些空格，后面写数目</p>
+</li>
+<li>
+<p>利用函数变量重写outline如下</p>
+</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+<span class="hljs-keyword">var</span> depth <span class="hljs-type">int</span> 
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin) 
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	forEachNode(doc, startElement, ElementNode)
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">forEachNode</span><span class="hljs-params">(n *html.Node, pre, post <span class="hljs-keyword">func</span>(n *html.Node)</span></span>) {
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+		pre(n)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> {
+		post(n)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startElement</span><span class="hljs-params">(n *html.Node)</span></span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+		depth++
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ElementNode</span><span class="hljs-params">(n *html.Node)</span></span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		depth--
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+	}
+}
+</code></pre>
+<h3 id="练习57">练习5.7</h3>
+<ul>
+<li>完善startElement和endElement函数，使其成为通用的HTML输出器。要求：输出注释结点，文本结点以及每个元素的属性（&lt; a href='...'&gt;）。使用简略格式输出没有孩子结点的元素（即用<img/>代替<img></img>）。编写测试，验证程序输出的格式正确。（详见11章）</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 在前括号信息内增加所需信息， 并且通过有无子节点判断是否增添后括号</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+<span class="hljs-keyword">var</span> depth <span class="hljs-type">int</span> 
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin) 
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	forEachNode(doc, startElement, ElementNode, leaveNode)
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">forEachNode</span><span class="hljs-params">(n *html.Node, pre, post, now <span class="hljs-keyword">func</span>(n *html.Node)</span></span>) {
+	<span class="hljs-keyword">if</span> n.FirstChild == <span class="hljs-literal">nil</span> {
+		now(n)
+		<span class="hljs-keyword">return</span> 
+	}
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+		pre(n)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		forEachNode(c, pre, post, now)
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> &amp;&amp; n.FirstChild != <span class="hljs-literal">nil</span>{
+		post(n)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startElement</span><span class="hljs-params">(n *html.Node)</span></span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s &quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			fmt.Printf(<span class="hljs-string">&quot;%s=%s &quot;</span>, a.Key, a.Val)
+		}
+		depth++
+		fmt.Printf(<span class="hljs-string">&quot;&gt;\n&quot;</span>)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ElementNode</span><span class="hljs-params">(n *html.Node)</span></span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		depth--
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;/%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">leaveNode</span><span class="hljs-params">(n *html.Node)</span></span> {
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s/ &quot;</span>, (depth + <span class="hljs-number">1</span>) * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+			fmt.Printf(<span class="hljs-string">&quot;%s=%s &quot;</span>, a.Key, a.Val)
+		}
+		fmt.Printf(<span class="hljs-string">&quot;&gt;\n&quot;</span>)
+	}
+}
+</code></pre>
+<h3 id="练习58">练习5.8</h3>
+<ul>
+<li>修改pre和post函数，使其返回布尔类型的返回值。返回false时，中止forEachNoded的遍历。使用修改后的代码编写ElementByID函数，根据用户输入的id查找第一个拥有该id元素的HTML元素，查找成功后，停止遍历。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+<span class="hljs-keyword">var</span> depth <span class="hljs-type">int</span> 
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin) 
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	_, ok := ElementByID(doc, <span class="hljs-string">&quot;lg&quot;</span>, startElement, ElementNode)
+	<span class="hljs-keyword">if</span> !ok {
+		fmt.Println(<span class="hljs-string">&quot;not found&quot;</span>)
+	}
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ElementByID</span><span class="hljs-params">(n *html.Node, id <span class="hljs-type">string</span>,  pre, post <span class="hljs-keyword">func</span>(n *html.Node,id <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">bool</span>) (*html.Node, <span class="hljs-type">bool</span>) {
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+	    ok := pre(n, id)
+		<span class="hljs-keyword">if</span> ok {
+			<span class="hljs-keyword">return</span> n, ok
+		}
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		ans1, ok := ElementByID(c, id, pre, post)
+		<span class="hljs-keyword">if</span> ok {
+			<span class="hljs-keyword">return</span> ans1, ok
+		}
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> {
+		post(n, id)
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, <span class="hljs-literal">false</span>
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">startElement</span><span class="hljs-params">(n *html.Node, id <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">bool</span>{
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+		depth++
+	}
+	<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> n.Attr {
+		<span class="hljs-keyword">if</span> a.Key == <span class="hljs-string">&quot;id&quot;</span> &amp;&amp; a.Val == id{
+			fmt.Printf(<span class="hljs-string">&quot;%*s found here\n&quot;</span>, (depth + <span class="hljs-number">1</span>) *<span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>)
+			<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>
+		}
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ElementNode</span><span class="hljs-params">(n *html.Node, id <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">bool</span>{
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		depth--
+		fmt.Printf(<span class="hljs-string">&quot;%*s&lt;/%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+	}
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+}
+
+</code></pre>
+<h3 id="练习59">练习5.9</h3>
+<ul>
+<li>编写函数expand，将s中的&quot;foo&quot;替换为f(&quot;foo&quot;)的返回值。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 编写函数expand，将s中的&quot;foo&quot;替换为f(&quot;foo&quot;)的返回值</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+
+	s := <span class="hljs-string">&quot;fooofffofofooffooofofofofofo&quot;</span>
+	fmt.Printf(<span class="hljs-string">&quot;%s\n%s\n&quot;</span>, s, expand(s, f))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">expand</span><span class="hljs-params">(s <span class="hljs-type">string</span>, f <span class="hljs-keyword">func</span>(<span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span>) <span class="hljs-type">string</span> {
+	newS := f(<span class="hljs-string">&quot;foo&quot;</span>)
+	<span class="hljs-keyword">return</span> strings.Replace(s, <span class="hljs-string">&quot;foo&quot;</span>, newS, <span class="hljs-number">-1</span>)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">f</span><span class="hljs-params">(s <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;?&quot;</span> + s + <span class="hljs-string">&quot;?&quot;</span>
+}
+</code></pre>
+<h2 id="匿名函数">匿名函数</h2>
+<ul>
+<li>命名函数只能在包级别进行声明， 匿名函数函数后面没有名称， 能够获取到整个词法环境</li>
+<li>示例</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	f := squares()
+	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10</span>; i++ {
+		<span class="hljs-built_in">println</span>(f())
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">squares</span><span class="hljs-params">()</span></span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> <span class="hljs-type">int</span> {
+	<span class="hljs-keyword">var</span> x <span class="hljs-type">int</span>
+	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> <span class="hljs-type">int</span> {
+		x++
+		<span class="hljs-keyword">return</span> x * x
+	}
+}
+</code></pre>
+<ul>
+<li>拓扑排序</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;sort&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> prereqs = <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>{
+	<span class="hljs-string">&quot;algorithms&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;calculus&quot;</span>:   {<span class="hljs-string">&quot;linear algebra&quot;</span>},
+	<span class="hljs-string">&quot;compilers&quot;</span>: {
+		<span class="hljs-string">&quot;data structures&quot;</span>,
+		<span class="hljs-string">&quot;formal languages&quot;</span>,
+		<span class="hljs-string">&quot;computer organization&quot;</span>,
+	},
+	<span class="hljs-string">&quot;data structures&quot;</span>:       {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;databases&quot;</span>:             {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;discrete math&quot;</span>:         {<span class="hljs-string">&quot;intro to programming&quot;</span>},
+	<span class="hljs-string">&quot;formal languages&quot;</span>:      {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;networks&quot;</span>:              {<span class="hljs-string">&quot;operating systems&quot;</span>},
+	<span class="hljs-string">&quot;operating systems&quot;</span>:     {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+	<span class="hljs-string">&quot;programming languages&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> i, course := <span class="hljs-keyword">range</span> topoSort(prereqs) {
+		fmt.Printf(<span class="hljs-string">&quot;%d:\t%s\n&quot;</span>, i+<span class="hljs-number">1</span>, course)
+	}
+}
+
+<span class="hljs-comment">// topoSort 实现了对有向无环图（DAG）的节点进行拓扑排序。</span>
+<span class="hljs-comment">// m 是一个映射，其中每个键代表图中的一个节点，对应的值是该节点指向的其他节点的列表。</span>
+<span class="hljs-comment">// 返回值是节点的拓扑排序列表。</span>
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">topoSort</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>)</span></span> []<span class="hljs-type">string</span> {
+    <span class="hljs-comment">// order 用于存储拓扑排序的结果。</span>
+    <span class="hljs-keyword">var</span> order []<span class="hljs-type">string</span>
+    <span class="hljs-comment">// seen 用于记录已经访问过的节点，以避免重复访问。</span>
+    seen := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">bool</span>)
+
+    <span class="hljs-comment">// visitAll 是一个递归函数，用于遍历节点并将其按拓扑顺序添加到 order 中。</span>
+    <span class="hljs-keyword">var</span> visitAll <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(items []<span class="hljs-type">string</span>)</span></span>
+    visitAll = <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(items []<span class="hljs-type">string</span>)</span></span> {
+        <span class="hljs-keyword">for</span> _, item := <span class="hljs-keyword">range</span> items {
+            <span class="hljs-comment">// 如果节点尚未被访问，则递归访问其依赖项，并将该节点添加到排序顺序中。</span>
+            <span class="hljs-keyword">if</span> !seen[item] {
+                seen[item] = <span class="hljs-literal">true</span>
+                visitAll(m[item])
+                order = <span class="hljs-built_in">append</span>(order, item)
+            }
+        }
+    }
+
+    <span class="hljs-comment">// keys 用于存储 m 中所有键（节点）的列表，以便进行排序。</span>
+    <span class="hljs-keyword">var</span> keys []<span class="hljs-type">string</span>
+    <span class="hljs-keyword">for</span> key := <span class="hljs-keyword">range</span> m {
+        keys = <span class="hljs-built_in">append</span>(keys, key)
+    }
+
+    <span class="hljs-comment">// 对节点进行排序，以便按照一定的顺序访问它们。</span>
+    sort.Strings(keys)
+
+    <span class="hljs-comment">// 使用排序后的节点列表调用 visitAll，以确保节点的处理顺序符合排序结果。</span>
+    visitAll(keys)  <span class="hljs-comment">// 这里是访问入口， 从这里开始拓扑排序</span>
+
+    <span class="hljs-comment">// 返回拓扑排序结果。</span>
+    <span class="hljs-keyword">return</span> order
+}
+</code></pre>
+<h3 id="练习510">练习5.10</h3>
+<ul>
+<li>重写topoSort函数，用map代替切片并移除对key的排序代码。验证结果的正确性（结果不唯一）。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 重写topoSort函数，用map代替切片并移除对key的排序代码。验证结果的正确性（结果不唯一）。</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> prereqs = <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>{
+	<span class="hljs-string">&quot;algorithms&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;calculus&quot;</span>:   {<span class="hljs-string">&quot;linear algebra&quot;</span>},
+	<span class="hljs-string">&quot;compilers&quot;</span>: {
+		<span class="hljs-string">&quot;data structures&quot;</span>,
+		<span class="hljs-string">&quot;formal languages&quot;</span>,
+		<span class="hljs-string">&quot;computer organization&quot;</span>,
+	},
+	<span class="hljs-string">&quot;data structures&quot;</span>:       {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;databases&quot;</span>:             {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;discrete math&quot;</span>:         {<span class="hljs-string">&quot;intro to programming&quot;</span>},
+	<span class="hljs-string">&quot;formal languages&quot;</span>:      {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;networks&quot;</span>:              {<span class="hljs-string">&quot;operating systems&quot;</span>},
+	<span class="hljs-string">&quot;operating systems&quot;</span>:     {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+	<span class="hljs-string">&quot;programming languages&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> i, course := <span class="hljs-keyword">range</span> topoSort(prereqs) {
+		fmt.Printf(<span class="hljs-string">&quot;%d:\t%s\n&quot;</span>, i+<span class="hljs-number">1</span>, course)
+	}
+}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">topoSort</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>)</span></span> []<span class="hljs-type">string</span> {
+    <span class="hljs-keyword">var</span> order []<span class="hljs-type">string</span>
+    seen := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">bool</span>)
+
+    <span class="hljs-keyword">var</span> visitAll <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>, s <span class="hljs-type">string</span>)</span></span>
+    visitAll = <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>, s <span class="hljs-type">string</span>)</span></span> {
+		<span class="hljs-keyword">if</span> seen[s] {  <span class="hljs-comment">// 多入口， 把判断改到循环开始</span>
+			<span class="hljs-keyword">return</span>
+		}
+		seen[s] = <span class="hljs-literal">true</span>
+		order = <span class="hljs-built_in">append</span>(order, s)
+		items := m[s]
+        <span class="hljs-keyword">for</span> _, item := <span class="hljs-keyword">range</span> items {
+			<span class="hljs-comment">//fmt.Println(s + &quot;!&quot; + item + &quot;!&quot;)</span>
+            visitAll(m , item)
+        }
+    }
+    <span class="hljs-keyword">for</span> key := <span class="hljs-keyword">range</span> m {
+		visitAll(m, key)
+    }
+    <span class="hljs-keyword">return</span> order
+}
+
+</code></pre>
+<h3 id="练习511">练习5.11</h3>
+<ul>
+<li>现在线性代数的老师把微积分设为了前置课程。完善topSort，使其能检测有向图中的环。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 使用带度数的拓扑排序，最后要是有度数不为零的，就是环上的。</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;sort&quot;</span>
+)
+
+<span class="hljs-keyword">var</span> prereqs = <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>{
+	<span class="hljs-string">&quot;algorithms&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;calculus&quot;</span>:   {<span class="hljs-string">&quot;linear algebra&quot;</span>},
+	<span class="hljs-string">&quot;compilers&quot;</span>: {
+		<span class="hljs-string">&quot;data structures&quot;</span>,
+		<span class="hljs-string">&quot;formal languages&quot;</span>,
+		<span class="hljs-string">&quot;computer organization&quot;</span>,
+	},
+	<span class="hljs-string">&quot;data structures&quot;</span>:       {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;databases&quot;</span>:             {<span class="hljs-string">&quot;data structures&quot;</span>},
+	<span class="hljs-string">&quot;discrete math&quot;</span>:         {<span class="hljs-string">&quot;intro to programming&quot;</span>},
+	<span class="hljs-string">&quot;formal languages&quot;</span>:      {<span class="hljs-string">&quot;discrete math&quot;</span>},
+	<span class="hljs-string">&quot;networks&quot;</span>:              {<span class="hljs-string">&quot;operating systems&quot;</span>},
+	<span class="hljs-string">&quot;operating systems&quot;</span>:     {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+	<span class="hljs-string">&quot;programming languages&quot;</span>: {<span class="hljs-string">&quot;data structures&quot;</span>, <span class="hljs-string">&quot;computer organization&quot;</span>},
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> i, course := <span class="hljs-keyword">range</span> topoSort(prereqs) {
+		fmt.Printf(<span class="hljs-string">&quot;%d:\t%s\n&quot;</span>, i+<span class="hljs-number">1</span>, course)
+	}
+}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">topoSort</span><span class="hljs-params">(m <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>][]<span class="hljs-type">string</span>)</span></span> []<span class="hljs-type">string</span> {
+	du := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">int</span>)
+	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> m {
+		<span class="hljs-keyword">for</span> _, tmp := <span class="hljs-keyword">range</span> v{
+			du[tmp] ++
+		}
+	}
+
+    <span class="hljs-keyword">var</span> order []<span class="hljs-type">string</span>
+    <span class="hljs-keyword">var</span> visitAll <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(now <span class="hljs-type">string</span>)</span></span>
+    visitAll = <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(now <span class="hljs-type">string</span>)</span></span> {
+		order = <span class="hljs-built_in">append</span>(order, now)
+        items := m[now]
+		<span class="hljs-keyword">for</span> _, item := <span class="hljs-keyword">range</span> items{
+            du[item] --
+            <span class="hljs-keyword">if</span> du[item] == <span class="hljs-number">0</span> {
+			<span class="hljs-comment">//	fmt.Println(&quot;?&quot;)</span>
+				visitAll(item)
+			}
+        }
+    }
+    <span class="hljs-keyword">var</span> keys []<span class="hljs-type">string</span>
+    <span class="hljs-keyword">for</span> key := <span class="hljs-keyword">range</span> m {
+        <span class="hljs-keyword">if</span> du[key] == <span class="hljs-number">0</span> {
+			keys = <span class="hljs-built_in">append</span>(keys, key)
+		<span class="hljs-comment">//	fmt.Println(key + &quot;!&quot;)</span>
+		}
+    }
+    sort.Strings(keys)
+    <span class="hljs-keyword">for</span> _, key := <span class="hljs-keyword">range</span> keys {
+        visitAll(key)
+    }
+	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> du {
+		<span class="hljs-keyword">if</span> v != <span class="hljs-number">0</span> {
+			<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;有环&quot;</span>)
+		}
+	}
+    <span class="hljs-keyword">return</span> order
+}
+</code></pre>
+<h3 id="练习512">练习5.12</h3>
+<ul>
+<li><a href="http://gopl.io/ch5/outline2%EF%BC%885.5%E8%8A%82%EF%BC%89%E7%9A%84startElement%E5%92%8CendElement%E5%85%B1%E7%94%A8%E4%BA%86%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8Fdepth%EF%BC%8C%E5%B0%86%E5%AE%83%E4%BB%AC%E4%BF%AE%E6%94%B9%E4%B8%BA%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%EF%BC%8C%E4%BD%BF%E5%85%B6%E5%85%B1%E4%BA%ABoutline%E4%B8%AD%E7%9A%84%E5%B1%80%E9%83%A8%E5%8F%98%E9%87%8F%E3%80%82">gopl.io/ch5/outline2（5.5节）的startElement和endElement共用了全局变量depth，将它们修改为匿名函数，使其共享outline中的局部变量。</a></li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// 将outline2 中的startElement和endElement改成匿名函数</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	<span class="hljs-comment">//fmt.Println(fetch())</span>
+	doc, err := html.Parse(os.Stdin) 
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;findlink: %v\n&quot;</span>, err)
+		os.Exit(<span class="hljs-number">1</span>)
+	}
+	<span class="hljs-keyword">var</span> depth <span class="hljs-type">int</span>
+	forEachNode(doc, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n *html.Node)</span></span>{
+		<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+			fmt.Printf(<span class="hljs-string">&quot;%*s&lt;%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+			depth++
+		}
+	}, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n *html.Node)</span></span>{
+		<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+			depth--
+			fmt.Printf(<span class="hljs-string">&quot;%*s&lt;/%s&gt;\n&quot;</span>, depth * <span class="hljs-number">2</span>, <span class="hljs-string">&quot;&quot;</span>, n.Data)
+		}
+	})
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">forEachNode</span><span class="hljs-params">(n *html.Node, pre, post <span class="hljs-keyword">func</span>(n *html.Node)</span></span>) {
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+		pre(n)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> {
+		post(n)
+	}
+}
+
+</code></pre>
+<h3 id="练习513">练习5.13</h3>
+<ul>
+<li>修改crawl，使其能保存发现的页面，必要时，可以创建目录来保存这些页面。只保存来自原始域名下的页面。假设初始页面在golang.org下，就不要保存vimeo.com下的页面。</li>
+<li>暂时略过</li>
+</ul>
+<h3 id="练习514">练习5.14</h3>
+<ul>
+<li>
+<p>使用breadthFirst遍历其他数据结构。比如，topoSort例子中的课程依赖关系（有向图）、个人计算机的文件层次结构（树）；你所在城市的公交或地铁线路（无向图）。</p>
+</li>
+<li>
+<p>暂时略过</p>
+</li>
+<li>
+<p>作用域问题， 由于匿名函数使用的变量常常是传址</p>
+</li>
+</ul>
+<h2 id="可变参数">可变参数</h2>
+<ul>
+<li>在声明可变参数函数时， 需要在参数列表的最后一个参数类型前面加上省略号...</li>
+<li>例子</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	fmt.Println(sum(<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>))
+	fmt.Println(sum())
+	fmt.Println(sum(<span class="hljs-number">1</span>))
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">sum</span><span class="hljs-params">(vals ...<span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {
+	total := <span class="hljs-number">0</span>
+	<span class="hljs-keyword">for</span> _, val := <span class="hljs-keyword">range</span> vals {
+		total += val
+	}
+	<span class="hljs-keyword">return</span> total
+}
+</code></pre>
+<h3 id="练习515">练习5.15</h3>
+<ul>
+<li>编写类似sum的可变参数函数max和min。考虑不传参时，max和min该如何处理，再编写至少接收1个参数的版本。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 编写类似sum的可变参数函数max和min。考虑不传参时，max和min该如何处理，再编写至少接收1个参数的版本。</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> <span class="hljs-string">&quot;fmt&quot;</span>
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>{
+	fmt.Println(max(<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">5</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">8</span>,<span class="hljs-number">9</span>,<span class="hljs-number">10</span>))
+	fmt.Println(min())
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">max</span><span class="hljs-params">(x ...<span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(x) == <span class="hljs-number">0</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+	}
+	max := x[<span class="hljs-number">0</span>]
+	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> x {
+		<span class="hljs-keyword">if</span> v &gt; max {
+			max = v
+		}
+	}
+	<span class="hljs-keyword">return</span> max
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">min</span><span class="hljs-params">(x ...<span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> {
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(x) == <span class="hljs-number">0</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
+	}
+	min := x[<span class="hljs-number">0</span>]
+	<span class="hljs-keyword">for</span> _, v := <span class="hljs-keyword">range</span> x {
+		<span class="hljs-keyword">if</span> v &lt; min {
+			min = v
+		}
+	}
+	<span class="hljs-keyword">return</span> min
+}
+
+</code></pre>
+<h3 id="练习516">练习5.16</h3>
+<ul>
+<li>编写多参数版本的strings.Join。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">// 将 多个字符串数组拼接成一个字符串</span>
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+)
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	strs := []<span class="hljs-type">string</span>{<span class="hljs-string">&quot;a&quot;</span>, <span class="hljs-string">&quot;b&quot;</span>, <span class="hljs-string">&quot;c&quot;</span>}
+	strs2 := []<span class="hljs-type">string</span>{<span class="hljs-string">&quot;d&quot;</span>, <span class="hljs-string">&quot;e&quot;</span>, <span class="hljs-string">&quot;f&quot;</span>}
+	fmt.Println(myJoin(<span class="hljs-string">&quot;,&quot;</span>))
+	fmt.Println(myJoin(<span class="hljs-string">&quot;?&quot;</span>, strs))
+	fmt.Println(myJoin(<span class="hljs-string">&quot;?&quot;</span>, strs, strs))
+	fmt.Println(myJoin(<span class="hljs-string">&quot;?&quot;</span>, strs, strs2, strs))
+
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">myJoin</span><span class="hljs-params">(s <span class="hljs-type">string</span>, elems ...[]<span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> {
+	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(elems) == <span class="hljs-number">0</span> {
+		<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>
+	}
+	<span class="hljs-keyword">var</span> str <span class="hljs-type">string</span>
+	<span class="hljs-keyword">for</span> _, elem := <span class="hljs-keyword">range</span> elems {
+		<span class="hljs-keyword">for</span> _, e := <span class="hljs-keyword">range</span> elem {
+			str += e + s
+		}
+	}
+	<span class="hljs-keyword">return</span> str[:<span class="hljs-built_in">len</span>(str)-<span class="hljs-built_in">len</span>(s)]
+}
+</code></pre>
+<h3 id="练习517">练习5.17</h3>
+<ul>
+<li>编写多参数版本的ElementsByTagName，函数接收一个HTML结点树以及任意数量的标签名，返回与这些标签名匹配的所有元素。下面给出了2个例子：</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		resp, err := http.Get(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %v\n&quot;</span>, err)
+			<span class="hljs-keyword">continue</span>
+		}
+		<span class="hljs-keyword">if</span> resp.StatusCode != http.StatusOK {
+			resp.Body.Close()
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %s: %v\n&quot;</span>, url, resp.Status)
+			<span class="hljs-keyword">continue</span> 
+		}
+		doc, err := html.Parse(resp.Body)
+		resp.Body.Close() 
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: parsing %s: %v\n&quot;</span>, url, err)
+			<span class="hljs-keyword">continue</span>
+		}
+		images := ElementsByTagName(doc, <span class="hljs-string">&quot;img&quot;</span>)
+		headings := ElementsByTagName(doc, <span class="hljs-string">&quot;h1&quot;</span>, <span class="hljs-string">&quot;h2&quot;</span>, <span class="hljs-string">&quot;h3&quot;</span>, <span class="hljs-string">&quot;h4&quot;</span>)
+		fmt.Println(images)
+		fmt.Println(headings)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">ElementsByTagName</span><span class="hljs-params">(doc *html.Node, name ...<span class="hljs-type">string</span>)</span></span> []*html.Node {
+	<span class="hljs-keyword">return</span> visit(<span class="hljs-literal">nil</span>, doc, name)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">visit</span><span class="hljs-params">(links []*html.Node, n *html.Node, v []<span class="hljs-type">string</span>)</span></span> []*html.Node{
+	<span class="hljs-keyword">if</span> n.Type == html.ElementNode {
+		<span class="hljs-keyword">for</span> _, a := <span class="hljs-keyword">range</span> v {
+			<span class="hljs-keyword">if</span> n.Data == a {
+				links = <span class="hljs-built_in">append</span>(links,  n)
+				<span class="hljs-keyword">return</span> links
+			}
+		}
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling { 
+		links = visit(links, c, v) <span class="hljs-comment">// 递归调用， </span>
+	}
+	<span class="hljs-keyword">return</span> links
+}
+
+</code></pre>
+<h2 id="deffered-函数">Deffered 函数</h2>
+<ul>
+<li>一般判断出错的方法如下</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+
+}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">title</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> {
+	resp, err := http.Get(url)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> err
+	}
+	<span class="hljs-comment">// Check Content-Type is HTML (e.g., &quot;text/html;charset=utf-8&quot;).</span>
+	ct := resp.Header.Get(<span class="hljs-string">&quot;Content-Type&quot;</span>)
+	<span class="hljs-keyword">if</span> ct != <span class="hljs-string">&quot;text/html&quot;</span> &amp;&amp; !strings.HasPrefix(ct, <span class="hljs-string">&quot;text/html;&quot;</span>) { 
+		resp.Body.Close() <span class="hljs-comment">// 多次调用关闭， 确保各种情况都会正常退出， 但是很麻烦</span>
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;%s has type %s, not text/html&quot;</span>, url, ct)
+	}
+	doc, err := html.Parse(resp.Body)
+	resp.Body.Close()
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;parsing %s as HTML: %v&quot;</span>, url, err)
+	}
+	visitNode := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n *html.Node)</span></span> {
+		<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;title&quot;</span> &amp;&amp; n.FirstChild != <span class="hljs-literal">nil</span> {
+			fmt.Println(n.FirstChild.Data)
+		}
+	}
+	forEachNode(doc, visitNode, <span class="hljs-literal">nil</span>)
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">forEachNode</span><span class="hljs-params">(n *html.Node, pre, post <span class="hljs-keyword">func</span>(n *html.Node)</span></span>) {
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+		pre(n)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> {
+		post(n)
+	}
+}
+
+</code></pre>
+<ul>
+<li>可以使用defer函数， 在调用普通函数或者方法的前面加上defer ， 当执行到该条语句时， 函数和参数表达式得到计算， 但函数并不执行。当函数返回时， 函数和参数表达式被执行。</li>
+<li>执行顺序和声明顺序相反</li>
+<li>在一些复杂的情况下， 可以使用defer函数， 确保函数在程序退出时执行。</li>
+<li>示例</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;strings&quot;</span>
+
+	<span class="hljs-string">&quot;golang.org/x/net/html&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+
+}
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">title</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">error</span> {
+	resp, err := http.Get(url)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> err
+	}
+	<span class="hljs-keyword">defer</span> resp.Body.Close() <span class="hljs-comment">// </span>
+	ct := resp.Header.Get(<span class="hljs-string">&quot;Content-Type&quot;</span>)
+	<span class="hljs-keyword">if</span> ct != <span class="hljs-string">&quot;text/html&quot;</span> &amp;&amp; !strings.HasPrefix(ct, <span class="hljs-string">&quot;text/html;&quot;</span>) { 
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;%s has type %s, not text/html&quot;</span>, url, ct)
+	}
+	doc, err := html.Parse(resp.Body)
+	<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+		<span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">&quot;parsing %s as HTML: %v&quot;</span>, url, err)
+	}
+	visitNode := <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(n *html.Node)</span></span> {
+		<span class="hljs-keyword">if</span> n.Type == html.ElementNode &amp;&amp; n.Data == <span class="hljs-string">&quot;title&quot;</span> &amp;&amp; n.FirstChild != <span class="hljs-literal">nil</span> {
+			fmt.Println(n.FirstChild.Data)
+		}
+	}
+	forEachNode(doc, visitNode, <span class="hljs-literal">nil</span>)
+	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>
+}
+
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">forEachNode</span><span class="hljs-params">(n *html.Node, pre, post <span class="hljs-keyword">func</span>(n *html.Node)</span></span>) {
+	<span class="hljs-keyword">if</span> pre != <span class="hljs-literal">nil</span> {
+		pre(n)
+	}
+	<span class="hljs-keyword">for</span> c := n.FirstChild; c != <span class="hljs-literal">nil</span>; c = c.NextSibling {
+		forEachNode(c, pre, post)
+	}
+	<span class="hljs-keyword">if</span> post != <span class="hljs-literal">nil</span> {
+		post(n)
+	}
+}
+
+</code></pre>
+<ul>
+<li>defer 也可以用来记录何时进入和退出函数</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;log&quot;</span>
+	<span class="hljs-string">&quot;time&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	bigSlowOperation()
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">bigSlowOperation</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">defer</span> trace(<span class="hljs-string">&quot;bigSlowOperation&quot;</span>)() <span class="hljs-comment">// 如果不加括号的的话， 则表示在退出时调用trace</span>
+
+	time.Sleep(<span class="hljs-number">10</span> * time.Second)
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">trace</span><span class="hljs-params">(msg <span class="hljs-type">string</span>)</span></span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> {
+	start := time.Now()
+	log.Printf(<span class="hljs-string">&quot;enter %s&quot;</span>, msg)
+	<span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> {
+		log.Printf(<span class="hljs-string">&quot;exit %s (%s)&quot;</span>, msg, time.Since(start))
+	}
+}
+</code></pre>
+<ul>
+<li>注意defer函数是在函数结束后才执行， 而不是其他代码域</li>
+<li>使用defer 改进fetch ， 将http相应信息写入本地文件而不是标准输出流</li>
+</ul>
+<pre><code class="language-go">
+<span class="hljs-comment">// fetch 改进版 将http相应信息写入本地文件而不是标准输出流</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+	<span class="hljs-string">&quot;path&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		local, n, err := fetch(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %v\n&quot;</span>, err)
+			<span class="hljs-keyword">return</span> 
+		}
+		fmt.Printf(<span class="hljs-string">&quot;%s %s %d\n&quot;</span>, url, local, n)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fetch</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> (filename <span class="hljs-type">string</span>, n <span class="hljs-type">int64</span>, err <span class="hljs-type">error</span>) {
+	resp, err := http.Get(url)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">0</span>, err
+    }
+    <span class="hljs-keyword">defer</span> resp.Body.Close() <span class="hljs-comment">// 延迟关闭</span>
+    local := path.Base(resp.Request.URL.Path)
+    <span class="hljs-keyword">if</span> local == <span class="hljs-string">&quot;/&quot;</span> {
+        local = <span class="hljs-string">&quot;index.html&quot;</span>
+    }
+    f, err := os.Create(local)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">0</span>, err
+    }
+    n, err = io.Copy(f, resp.Body)
+    <span class="hljs-keyword">if</span> closeErr := f.Close(); err == <span class="hljs-literal">nil</span> {
+        err = closeErr
+    }
+    <span class="hljs-keyword">return</span> local, n, err
+}
+</code></pre>
+<h3 id="练习518">练习5.18</h3>
+<ul>
+<li>不修改fetch的行为，重写fetch函数，要求使用defer机制关闭文件。</li>
+</ul>
+<pre><code class="language-go"><span class="hljs-comment">//  不修改fetch的行为，重写fetch函数，要求使用defer机制关闭文件。</span>
+
+<span class="hljs-keyword">package</span> main
+
+<span class="hljs-keyword">import</span> (
+	<span class="hljs-string">&quot;fmt&quot;</span>
+	<span class="hljs-string">&quot;io&quot;</span>
+	<span class="hljs-string">&quot;net/http&quot;</span>
+	<span class="hljs-string">&quot;os&quot;</span>
+	<span class="hljs-string">&quot;path&quot;</span>
+)
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> {
+	<span class="hljs-keyword">for</span> _, url := <span class="hljs-keyword">range</span> os.Args[<span class="hljs-number">1</span>:] {
+		local, n, err := fetch(url)
+		<span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+			fmt.Fprintf(os.Stderr, <span class="hljs-string">&quot;fetch: %v\n&quot;</span>, err)
+			<span class="hljs-keyword">return</span> 
+		}
+		fmt.Printf(<span class="hljs-string">&quot;%s %s %d\n&quot;</span>, url, local, n)
+	}
+}
+
+<span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">fetch</span><span class="hljs-params">(url <span class="hljs-type">string</span>)</span></span> (filename <span class="hljs-type">string</span>, n <span class="hljs-type">int64</span>, err <span class="hljs-type">error</span>) {
+	resp, err := http.Get(url)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">0</span>, err
+    }
+    <span class="hljs-keyword">defer</span> resp.Body.Close() <span class="hljs-comment">// 延迟关闭</span>
+    local := path.Base(resp.Request.URL.Path)
+    <span class="hljs-keyword">if</span> local == <span class="hljs-string">&quot;/&quot;</span> {
+        local = <span class="hljs-string">&quot;index.html&quot;</span>
+    }
+    f, err := os.Create(local)
+    <span class="hljs-keyword">if</span> err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-number">0</span>, err
+    }
+    n, err = io.Copy(f, resp.Body)
+	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> {   <span class="hljs-comment">// defer 执行顺序在return 之后， 但是在返回值赋值给调用方之前</span>
+		<span class="hljs-comment">// 为什么defer能调用返回值，因为这里返回值是有名的， defer 函数只能访问有名返回值</span>
+		<span class="hljs-keyword">if</span> closeErr := f.Close(); err == <span class="hljs-literal">nil</span> {
+			err = closeErr
+		}
+	}()
+    <span class="hljs-keyword">return</span> local, n, err
+}
+</code></pre>
+<h2 id="panic-异常">panic 异常</h2>
+<ul>
+<li></li>
+</ul>
+
+            <script async src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+            
+        </body>
+        </html>
