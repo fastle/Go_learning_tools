@@ -3812,3 +3812,255 @@ func (c *LineCounter) Write(p []byte) (int, error) {
 ### 练习7.2 
 -  写一个带有如下函数签名的函数CountingWriter，传入一个io.Writer接口类型，返回一个把原来的Writer封装在里面的新的Writer类型和一个表示新的写入字节数的int64类型指针。
 -  
+
+```go
+// 传入一个io.Writer接口类型，返回一个把原来的Writer封装在里面的新的Writer类型和一个表示新的写入字节数的int64类型指针。
+// f返回的是一个新的类型， 和Printf的封装不是很一样
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
+type CountWriter struct {
+	Writer io.Writer 
+	Count int64 
+} 
+
+func (cw *CountWriter) Write (content []byte) (int, error) {
+	n, err := cw.Writer.Write(content)
+	if err != nil {
+		return n, err
+	}
+	cw.Count += int64(len(content))
+	return n, nil
+}
+
+
+func CountingWriter(w  io.Writer)(io.Writer, *int64) {
+	cw := CountWriter{Writer: w}
+	return &cw, &cw.Count // 
+}
+
+func main() {
+	cw, counter := CountingWriter(os.Stdout)
+	fmt.Fprintf(cw, "%s", "Print somethind to the screen...") // 在这里调用Write 的时候计数器才加的
+	fmt.Println(*counter)
+}
+```
+
+### 练习7.3
+-  为在gopl.io/ch4/treesort (§4.4)的*tree类型实现一个String方法去展示tree类型的值序列。
+-  跳过
+-  
+
+## 接口类型
+- 一些常见接口
+
+```go
+package io 
+type Reader interface { // 关键词是type 
+	Read(p []byte) (n int, err error)
+}
+
+type Closer interface {
+	Close() error 
+}
+
+type ReadWriter interface { // 可以使用已有的接口类型来进行组合
+	Reader
+	Writer 
+}
+```
+- 发现可以使用已有的接口类型简写命名接口， 这种方式叫做接口内嵌
+
+
+### 练习7.4
+-  strings.NewReader函数通过读取一个string参数返回一个满足io.Reader接口类型的值（和其它值）。实现一个简单版本的NewReader，用它来构造一个接收字符串输入的HTML解析器
+-  跳过
+
+## 实现接口条件
+- 首先必须实现该接口需要的所有方法.
+- 接口赋值规则对且看下面示例
+```go
+var w io.Writer
+w = os.Stdout           // OK: *os.File has Write method
+w = new(bytes.Buffer)   // OK: *bytes.Buffer has Write method
+w = time.Second         // compile error: time.Duration lacks Write method
+
+var rwc io.ReadWriteCloser
+rwc = os.Stdout         // OK: *os.File has Read, Write, Close methods
+rwc = new(bytes.Buffer) // compile error: *bytes.Buffer lacks Close method
+```
+- 甚至可以使用接口类型来定义变量， 并且赋值给接口变量
+- 所以接口可以用来实现基于类的语言的接口的效果， 通过抽取共性形成接口， 并且通过组合接口来继承
+- 区别是Go语言可以在需要时才定义新的抽象和分组， 并且不用修改原有类型的定义。
+### 空接口
+- 空接口类型是所有类型的超类型， 所有类型都实现了空接口， 空接口类型可以接收任何类型的值， 也可以返回任何类型的值
+- 比如说 在我们经常使用的Printf 和 Fprintf函数中， 就使用空接口来接收任何值
+
+### 接口值
+- 概念上一个接口的值包含两部分：一个类型和一个值。 由于Go语言是静态类型的语言， 我们不认为他的类型是一个值
+- 下面四个语句中， 变量w得到了三个不同的值，
+```go
+var w io.Writer //1
+w = os.Stdout //2 
+w = new(bytes.Buffer)//3
+w = nil //1
+```
+
+- 引起的问题大概如下， 一个包含nil指针的接口不是nil接口
+```go
+const debug = true
+
+func main() {
+    var buf *bytes.Buffer
+    buf = new(bytes.Buffer) 
+    f(buf)
+}
+
+func f(out io.Writer) {
+    if out != nil {
+        out.Write([]byte("done!\n"))
+    }
+}
+```
+- 使用时会报错， out 是一个类型为*bytes.Buffer的指针，值是nil， 但是他并不是nil接口， 这时候会报错
+
+
+
+
+## 常见接口解析
+
+### flag.Value
+
+- flag.Value 定义如下
+```go
+package flag
+
+// Value is the interface to the value stored in a flag.
+type Value interface {
+    String() string
+    Set(string) error
+}
+```
+- 思考下面这个会休眠特定时间的程序
+```go
+
+var period = flag.Duration("period", 1*time.Second, "sleep period")
+
+func main() {
+    flag.Parse()
+    fmt.Printf("Sleeping for %v...", *period)
+    time.Sleep(*period)
+    fmt.Println()
+}
+```
+- 其中period是一个Duration类型的值， 并且实现了String和Set方法， 所以可以使用flag.Duration函数来创建period变量
+
+- 我们对之前使用过的tempconv程序进行改编, 定义了String() 和set(), 并通过set分类自动输出转换后的信息， 
+```go
+// 进行摄氏温度和华氏温度的转换
+package main
+
+import (
+	"flag"
+	"fmt"
+)
+
+
+type Celsius float64
+type Fahrenheit float64
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+
+type celsiusFlag struct{ Celsius }
+
+func (f *celsiusFlag) Set(s string) error {
+    var unit string
+    var value float64
+    fmt.Sscanf(s, "%f%s", &value, &unit) // no error check needed
+    switch unit {
+    case "C", "°C":
+        f.Celsius = Celsius(value)
+        return nil
+    case "F", "°F":
+        f.Celsius = FToC(Fahrenheit(value))
+        return nil
+    }
+    return fmt.Errorf("invalid temperature %q", s)
+}
+
+func (f *celsiusFlag)String() string { return fmt.Sprintf("%g°C", f.Celsius) }
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}  // 构造时若两个底层是相同类型可以直接构造
+func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
+
+func CelsiusFlag(name string, value Celsius, usage string) *Celsius {
+    f := celsiusFlag{value}
+    flag.CommandLine.Var(&f, name, usage) /// 因为这里已经实现了String() 和Set() 所以可以调用
+    return &f.Celsius
+}
+
+var temp = CelsiusFlag("temp", 20.0, "the temperature")
+
+func main() {
+    flag.Parse()
+    fmt.Println(*temp)
+}
+```
+
+### sort.Interface
+- 
+
+```go
+package sort
+
+type Interface interface {
+    Len() int
+    Less(i, j int) bool // i, j are indices of sequence elements
+    Swap(i, j int)
+}
+
+```
+### http.Handler 
+
+```go
+package http
+
+type Handler interface {
+    ServeHTTP(w ResponseWriter, r *Request)
+}
+
+func ListenAndServe(address string, h Handler) error
+```
+
+- ListenAndServe函数接收一个地址和Handler接口类型的值， 并且返回一个错误, 会一直运行， 直到遇见一个错误而失败
+
+### error 
+```go
+type error interface {
+    Error() string
+}
+
+```
+
+## 类型断言
+- 类型断言是Go语言中一个重要的特性， 它允许我们检查一个接口的值是否属于某个类型， 并且获取该类型的值表示为x.(T)
+- 这里的T有两种可能， 一种是具体的类型， 这种情况的话， 成功则会从返回x的动态值， 失败的话则返回panic
+- 另一种是接口， 若成功则并不获取动态值， 
+
+- 如果采用下面这种写法， 则在失败的时候不会崩溃， 并且能能够获取到错误信息。
+```go
+var w io.Writer = os.Stdout
+f, ok := w.(*os.File)      // success:  ok, f == os.Stdout
+b, ok := w.(*bytes.Buffer) // failure: !ok, b == nil
+```
+
