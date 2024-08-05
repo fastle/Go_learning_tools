@@ -3879,7 +3879,217 @@ type ReadWriter interface { // 可以使用已有的接口类型来进行组合
 
 ### 练习7.4
 -  strings.NewReader函数通过读取一个string参数返回一个满足io.Reader接口类型的值（和其它值）。实现一个简单版本的NewReader，用它来构造一个接收字符串输入的HTML解析器
--  跳过
+```go
+// strings.NewReader函数通过读取一个string参数返回一个满足io.Reader接口类型的值（和其它值）。实现一个简单版本的NewReader，用它来构造一个接收字符串输入的HTML解析器
+// 我的理解是， 构建一个一个NewReader函数， 输入html 字符串， 返回一个自定义reader， 然后传到html.Parse() 中即可
+package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+
+	"golang.org/x/net/html"
+)
+
+/*
+type Reader interface {
+	Read(p []byte) (n int, err error)
+}
+
+
+*/
+
+/*
+返回的是一个string.Reader
+
+func (r *Reader) Read(b []byte) (n int, err error) {
+	if r.i >= int64(len(r.s)) {
+		return 0, io.EOF
+	}
+	r.prevRune = -1
+	n = copy(b, r.s[r.i:])
+	r.i += int64(n)
+	return
+}
+*/
+
+type MyReader struct {
+	s string
+	i int64
+}
+
+func (r *MyReader) Read(b []byte) (n int, err error) {
+	if r.i >= int64(len(r.s)) {
+		return 0, io.EOF
+	}
+	n = copy(b, r.s[r.i:])
+	r.i += int64(n)
+	return n, nil 
+}
+
+
+func NewReader(s string) *MyReader {
+	return &MyReader{s, 0}
+}
+
+func main() {
+	readernow := NewReader("<html><head></head><body><a href=\"this is a test\">aaa</a></body></html>")
+	doc, err := html.Parse(readernow)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "ex7.4: %v\n", err)
+		os.Exit(1)
+	}
+	for _, n := range visit(nil, doc) {
+		fmt.Println(n)
+	}
+}
+
+func visit(links []string, n *html.Node) []string {
+	if n.Type == html.ElementNode && n.Data == "a" {
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				links = append(links, a.Val)
+			}
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling { 
+		links = visit(links, c) // 递归调用， 
+	}
+	return links
+}
+
+
+```
+
+### 练习7.5
+-  io包里面的LimitReader函数接收一个io.Reader接口类型的r和字节数n，并且返回另一个从r中读取字节但是当读完n个字节后就表示读到文件结束的Reader。实现这个LimitReader函数：
+
+```go
+// io包里面的LimitReader函数接收一个io.Reader接口类型的r和字节数n，并且返回另一个从r中读取字节但是当读完n个字节后就表示读到文件结束的Reader。实现这个LimitReader函数：s
+package main
+
+import (
+	"io"
+	"strings"
+)
+
+type LimitType struct {
+	n int64
+	i int64 
+	w io.Reader
+}
+
+func (r *LimitType) Read(p []byte) (n int, err error) {
+	if r.i >= r.n {
+		return 0, io.EOF 
+	}
+	if r.i + int64(len(p)) > r.n {
+		p = p[:r.n - r.i]
+	} 
+	n, err = r.w.Read(p)
+	r.i += int64(n)
+	return 
+}
+
+func LimitReader(r io.Reader, n int64) io.Reader {
+	return &LimitType{n, 0, r}
+}
+
+func main(){
+	r := LimitReader(io.Reader(strings.NewReader(string("hello world"))), 5)
+	for {
+		b := make([]byte, 1)
+		n, err := r.Read(b)
+		if err != nil {
+			break
+		}
+		println(string(b[:n]))
+	}
+}
+```
+
+### 练习7.6
+-  对tempFlag加入支持开尔文温度。
+```go
+// 对tempFlag加入支持开尔文温度。
+/*
+package flag
+
+// Value is the interface to the value stored in a flag.
+type Value interface {
+    String() string
+    Set(string) error
+}
+
+
+*/
+package main
+
+import (
+	"flag"
+	"fmt"
+)
+
+
+type Celsius float64
+type Fahrenheit float64
+type Kelvin float64 
+
+const (
+	AbsoluteZeroC Celsius = -273.15
+	FreezingC Celsius = 0
+	BoilingC Celsius = 100
+)
+
+
+type celsiusFlag struct{ Celsius }
+
+func (f *celsiusFlag) Set(s string) error {
+    var unit string
+    var value float64
+    fmt.Sscanf(s, "%f%s", &value, &unit)
+    switch unit {
+    case "C", "°C":
+        f.Celsius = Celsius(value)
+        return nil
+    case "F", "°F":
+        f.Celsius = FToC(Fahrenheit(value))
+        return nil
+	case "K", "°K":
+		f.Celsius = KToC(Kelvin(value))
+		return nil 
+	}
+	return fmt.Errorf("invalid temperature %q", s)
+}
+func (c Celsius) String() string { return fmt.Sprintf("%g°C", c)}
+
+func CToF(c Celsius) Fahrenheit { return Fahrenheit(c * 9 / 5 + 32)}
+func FToC(f Fahrenheit) Celsius { return Celsius((f - 32) * 5 / 9)}
+func KToC(k Kelvin) Celsius {return Celsius(k + Kelvin(AbsoluteZeroC))}
+func KToF(k Kelvin) Fahrenheit {return Fahrenheit(CToF(KToC(k)))}
+
+func CToK(c Celsius) Kelvin {return Kelvin(c - AbsoluteZeroC)}
+
+func FToK(f Fahrenheit) Kelvin {return CToK(FToC(f))}
+func CelsiusFlag(name string, value Celsius, usage string) *Celsius {
+    f := celsiusFlag{value}
+    flag.CommandLine.Var(&f, name, usage) // 因为这里已经实现了String() 和Set() 所以可以调用
+    return &f.Celsius
+}
+
+var temp = CelsiusFlag("temp", 20.0, "the temperature")
+
+func main() {
+    flag.Parse()
+    fmt.Println(*temp)
+}
+```
+### 练习7.7
+- 解释为什么帮助信息在它的默认值是20.0没有包含°C的情况下输出了°C。
+- 因为我们定义实现了Celsius.string， 在输出时调用了， 所以会直接输出
+- 
+
 
 ## 实现接口条件
 - 首先必须实现该接口需要的所有方法.
@@ -4052,7 +4262,7 @@ type error interface {
 
 ```
 
-## 类型断言
+### 类型断言
 - 类型断言是Go语言中一个重要的特性， 它允许我们检查一个接口的值是否属于某个类型， 并且获取该类型的值表示为x.(T)
 - 这里的T有两种可能， 一种是具体的类型， 这种情况的话， 成功则会从返回x的动态值， 失败的话则返回panic
 - 另一种是接口， 若成功则并不获取动态值， 
@@ -4064,3 +4274,97 @@ f, ok := w.(*os.File)      // success:  ok, f == os.Stdout
 b, ok := w.(*bytes.Buffer) // failure: !ok, b == nil
 ```
 
+### sort.Interface
+```go
+type Interface interface {
+	Len() int 
+	Less(i, j int) bool
+	Swap(i, j int) 
+}
+```
+- 教材实例
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"sort"
+	"text/tabwriter"
+	"time"
+)
+
+
+type Track struct {
+	Title  string
+	Artist string
+	Album  string
+	Year   int
+	Length time.Duration
+}
+
+var tracks = []*Track{
+    {"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
+    {"Go", "Moby", "Moby", 1992, length("3m37s")},
+    {"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
+    {"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
+}
+
+func length(s string) time.Duration {
+    d, err := time.ParseDuration(s)
+    if err != nil {
+        panic(s)
+    }
+    return d
+}
+
+func PrintTracks(tracks []*Track) {
+	const format = "%v\t%v\t%v\t%v\t%v\t\n"
+	tw := new(tabwriter.Writer).Init(os.Stdout,0, 8, 2, ' ', 0)
+	fmt.Fprintf(tw, format, "Title", "Artist", "Album", "Year", "Length")
+	fmt.Fprintf(tw, format, "-----", "------", "-----", "----", "------")
+	for _, t := range tracks {
+		fmt.Fprintf(tw, format, t.Title, t.Artist, t.Album, t.Year, t.Length)
+	}
+	tw.Flush() // 计算各列宽度， 输出表格
+}
+type byArtist []*Track  // 两种类型直接转， 但是会对应不同函数
+func (x byArtist) Len() int {return len(x)}
+func (x byArtist) Less(i, j int) bool {return x[i].Artist < x[j].Artist}
+
+func (x byArtist) Swap(i, j int) {x[i], x[j] = x[j], x[i]}
+
+
+type customSort struct {
+	t []*Track 
+	less func(x, y *Track) bool // 只需要自定义less比较方法
+}
+
+func (x customSort) Len() int {return len(x.t)}
+
+func (x customSort) Less(i, j int) bool {return x.less(x.t[i], x.t[j])}
+
+func (x customSort) Swap(i, j int) {x.t[i], x.t[j] = x.t[j], x.t[i]}
+
+func main() {
+	sort.Sort(byArtist(tracks))
+	PrintTracks(tracks)
+	sort.Sort(sort.Reverse(byArtist(tracks)))
+	PrintTracks(tracks)
+	sort.Sort(customSort{tracks, func(x, y *Track)bool {
+		if x.Title != y.Title {
+			return x.Title < y.Title
+		}
+		if x.Year != y.Year {
+			return x.Year < y.Year
+		}
+		if x.Length != y.Length {
+			return x.Length < y.Length
+		}
+		return false
+	}})
+	PrintTracks(tracks)
+}
+```
+### 练习7.8
+-  很多图形界面提供了一个有状态的多重排序表格插件：主要的排序键是最近一次点击过列头的列，第二个排序键是第二最近点击过列头的列，等等。定义一个sort.Interface的实现用在这样的表格中。比较这个实现方式和重复使用sort.Stable来排序的方式。
