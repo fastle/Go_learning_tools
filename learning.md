@@ -4368,3 +4368,512 @@ func main() {
 ```
 ### 练习7.8
 -  很多图形界面提供了一个有状态的多重排序表格插件：主要的排序键是最近一次点击过列头的列，第二个排序键是第二最近点击过列头的列，等等。定义一个sort.Interface的实现用在这样的表格中。比较这个实现方式和重复使用sort.Stable来排序的方式。
+```go
+// 设置一个键值slice， 每次追加一个键值
+package main
+
+import (
+	"fmt"
+	"os"
+	"sort"
+	"text/tabwriter"
+	"time"
+)
+
+type Track struct {
+	Title  string
+	Artist string
+	Album  string
+	Year   int
+	Length time.Duration
+}
+
+var tracks = []*Track{
+	{"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
+	{"Go", "Moby", "Moby", 1992, length("3m37s")},
+	{"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
+	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
+}
+
+func PrintTracks(tracks []*Track) {
+	const format = "%v\t%v\t%v\t%v\t%v\t\n"
+	tw := new(tabwriter.Writer).Init(os.Stdout,0, 8, 2, ' ', 0)
+	fmt.Fprintf(tw, format, "Title", "Artist", "Album", "Year", "Length")
+	fmt.Fprintf(tw, format, "-----", "------", "-----", "----", "------")
+	for _, t := range tracks {
+		fmt.Fprintf(tw, format, t.Title, t.Artist, t.Album, t.Year, t.Length)
+	}
+	tw.Flush() // 计算各列宽度， 输出表格
+}
+
+func length(s string) time.Duration {
+    d, err := time.ParseDuration(s)
+    if err != nil {
+        panic(s)
+    }
+    return d
+}
+
+
+type table struct {
+	t    []*Track
+	keys []string // keys to sort by
+}
+
+func (t table) Len() int {
+	return len(t.t)
+}
+
+func (t table) Less(i, j int) bool {
+	for p := len(t.keys) - 1; p >= 0; p--{
+		fmt.Println(t.keys[p])
+		switch t.keys[p] {
+		case "Title":
+			if t.t[i].Title != t.t[j].Title {
+				return t.t[i].Title < t.t[j].Title
+			}
+		case "Artist":
+			if t.t[i].Artist != t.t[j].Artist {
+				return t.t[i].Artist < t.t[j].Artist
+			}
+		case "Album":
+			if t.t[i].Album != t.t[j].Album {
+				return t.t[i].Album < t.t[j].Album
+			}
+		case "Year":
+			if t.t[i].Year != t.t[j].Year {
+				return t.t[i].Year < t.t[j].Year
+			}
+		}
+	}
+	return false // all keys are equal
+}
+
+func (t table) Swap(i, j int) {
+	t.t[i], t.t[j] = t.t[j], t.t[i]
+}
+
+func setPrime(t *table, key string) {
+	t.keys = append(t.keys, key)
+}
+func main() {
+	table := table{tracks, []string{}}
+	setPrime(&table, "Year")
+	setPrime(&table, "Title")
+	sort.Sort(table)
+	PrintTracks(table.t)
+}
+
+```
+
+### 练习7.9
+- 使用html/template包（§4.6）替代printTracks将tracks展示成一个HTML表格。将这个解决方案用在前一个练习中，让每次点击一个列的头部产生一个HTTP请求来排序这个表格。
+
+```go
+//使用html/template包（§4.6）替代printTracks将tracks展示成一个HTML表格。将这个解决方案用在前一个练习中，让每次点击一个列的头部产生一个HTTP请求来排序这个表格。
+
+package main
+
+import (
+	"fmt"
+	"html/template"
+	"io"
+	"log"
+	"net/http"
+	"sort"
+	"time"
+)
+
+type Track struct {
+	Title  string
+	Artist string
+	Album  string
+	Year   int
+	Length time.Duration
+}
+
+var tracks = []*Track{
+	{"Go", "Delilah", "From the Roots Up", 2012, length("3m38s")},
+	{"Go", "Moby", "Moby", 1992, length("3m37s")},
+	{"Go Ahead", "Alicia Keys", "As I Am", 2007, length("4m36s")},
+	{"Ready 2 Go", "Martin Solveig", "Smash", 2011, length("4m24s")},
+}
+
+var trackTable = template.Must(template.New("Track").Parse(`
+<h1> Tracks </h1>
+<table>
+<tr style='text-align: left'>
+    <th onclick="submitform('Title')">Title
+        <form action="" name="Title" method="post">
+            <input type="hidden" name="orderby" value="Title"/>
+        </form>
+    </th>
+    <th>Artist
+        <form action="" name="Artist" method="post">
+            <input type="hidden" name="orderby" value="Artist"/>
+        </form>
+    </th>
+    <th>Album
+        <form action="" name="Album" method="post">
+            <input type="hidden" name="orderby" value="Album"/>
+        </form>
+    </th>
+    <th onclick="submitform('Year')">Year
+        <form action="" name="Year" method="post">
+            <input type="hidden" name="orderby" value="Year"/>
+        </form>
+    </th>
+    <th onclick="submitform('Length')">Length
+        <form action="" name="Length" method="post">
+            <input type="hidden" name="orderby" value="Length"/>
+        </form>
+    </th>
+</tr>
+{{range .T}}
+<tr>
+    <td>{{.Title}}</td>
+    <td>{{.Artist}}</td>
+    <td>{{.Album}}</td>
+    <td>{{.Year}}</td>
+    <td>{{.Length}}</td>
+</tr>
+{{end}}
+</table>
+
+<script>
+function submitform(formname) {
+    document[formname].submit();
+}
+</script>
+`))
+
+func length(s string) time.Duration {
+    d, err := time.ParseDuration(s)
+    if err != nil {
+        panic(s)
+    }
+    return d
+}
+
+
+type table struct {
+	T    []*Track
+	keys []string // keys to sort by
+}
+
+func (t table) Len() int {
+	return len(t.T)
+}
+
+func (t table) Less(i, j int) bool {
+	for p := len(t.keys) - 1; p >= 0; p--{
+		fmt.Println(t.keys[p])
+		switch t.keys[p] {
+		case "Title":
+			if t.T[i].Title != t.T[j].Title {
+				return t.T[i].Title < t.T[j].Title
+			}
+		case "Artist":
+			if t.T[i].Artist != t.T[j].Artist {
+				return t.T[i].Artist < t.T[j].Artist
+			}
+		case "Album":
+			if t.T[i].Album != t.T[j].Album {
+				return t.T[i].Album < t.T[j].Album
+			}
+		case "Year":
+			if t.T[i].Year != t.T[j].Year {
+				return t.T[i].Year < t.T[j].Year
+			}
+		}
+	}
+	return false // all keys are equal
+}
+
+func (t table) Swap(i, j int) {
+	t.T[i], t.T[j] = t.T[j], t.T[i]
+}
+
+func setPrime(t *table, key string) {
+	t.keys = append(t.keys, key)
+}
+
+
+func printTracks(w io.Writer, x *table) {
+        trackTable.Execute(w, x)
+}
+func main() {
+	table := table{tracks, []string{}}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request){
+		if err := r.ParseForm(); err != nil {
+            fmt.Printf("ParseForm: %v\n", err)
+        }
+		for k, v := range r.Form {
+			if k == "orderby" {
+				setPrime(&table, v[0])
+			}
+		}
+		sort.Sort(table)
+		printTracks(w, &table)
+	})
+	log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+
+```
+
+### 练习7.10
+- sort.Interface类型也可以适用在其它地方。编写一个IsPalindrome(s sort.Interface) bool函数表明序列s是否是回文序列，换句话说反向排序不会改变这个序列。假设如果!s.Less(i, j) && !s.Less(j, i)则索引i和j上的元素相等。
+```go
+func IsPalindrome(s sort.Interface) bool {
+	l := s.Len()
+	for i := 0; i < l / 2; i++ {
+		if s.Less(i, l - i - 1) != s.Less(l - i - 1, i) {
+			return false
+		}
+	}
+	return true 
+}
+```
+
+### http.Handle 接口
+
+```go
+package http
+
+type Handler interface {
+	ServeHTTP(w ResponseWriter, r *Request)
+}
+// L
+func ListenAndServe(address string, h Handler) error 
+```
+
+- 实现一个简单的电子商务网站如下
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func main() {
+	db := database{"shoes": 50, "socks": 5}
+	log.Fatal(http.ListenAndServe("localhost:8000", db))
+}
+
+type dollars float32
+
+func (d dollars) String() string { return fmt.Sprintf("$%.2f", d) }
+
+type database map[string]dollars
+
+func (db database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	for item, price := range db {
+		fmt.Fprintf(w, "%s: %s\n", item, price)
+	}
+}
+```
+
+- 指定参数方法
+
+```go
+
+```
+
+- 下面的程序中，我们创建一个ServeMux并且使用它将URL和相应处理/list和/price操作的handler联系起来，这些操作逻辑都已经被分到不同的方法中。然后我们在调用ListenAndServe函数中使用ServeMux为主要的handler。
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
+
+func main() {
+	db := database{"shoes": 50, "socks": 5}
+	mux := http.NewServeMux()
+	mux.Handle("/list", http.HandlerFunc(db.list))
+	mux.Handle("/price", http.HandlerFunc(db.price))
+	log.Fatal(http.ListenAndServe("localhost:8000", mux))
+}
+
+type dollars float32
+
+func (d dollars) String() string { return fmt.Sprintf("$%.2f", d) }
+
+type database map[string]dollars
+
+
+func (db database) list (w http.ResponseWriter, r *http.Request) {
+	for item, price := range db {
+		fmt.Fprintf(w, "%s: %s\n", item, price)
+	}
+}
+
+func (db database) price(w http.ResponseWriter, r *http.Request) {
+	item := r.URL.Query().Get("item") // 获取参数方法
+		price, ok := db[item]
+		if ! ok{
+			w.WriteHeader(http.StatusNotFound) // 404
+			fmt.Fprintf(w, "no such item: %q\n", item)
+			return
+		}
+		fmt.Fprintf(w, "%s\n", price)
+}
+
+
+```
+
+- 可以简写为
+```go
+func main() {
+    db := database{"shoes": 50, "socks": 5}
+    http.HandleFunc("/list", db.list)
+    http.HandleFunc("/price", db.price)
+    log.Fatal(http.ListenAndServe("localhost:8000", nil))
+}
+```
+
+
+### 练习7.11
+-  增加额外的handler让客户端可以创建，读取，更新和删除数据库记录。例如，一个形如 /update?item=socks&price=6 的请求会更新库存清单里一个货品的价格并且当这个货品不存在或价格无效时返回一个错误值。（注意：这个修改会引入变量同时更新的问题）
+
+```go
+package main
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+)
+
+func main() {
+	db := database{"shoes": 50, "socks": 5}
+    log.Fatal(http.ListenAndServe("localhost:8000", db))
+}
+
+type dollars float32
+
+func (d dollars) String() string { return fmt.Sprintf("$%.2f", d) }
+
+type database map[string]dollars
+
+func (db database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/list":
+		for item, price := range db {
+			fmt.Fprintf(w, "%s: %s\n", item, price)
+		}
+	case "/price":
+		item := r.URL.Query().Get("item") // 获取参数方法
+		price, ok := db[item]
+		if ! ok{
+			w.WriteHeader(http.StatusNotFound) // 404
+			fmt.Fprintf(w, "no such item: %q\n", item)
+			return
+		}
+		fmt.Fprintf(w, "%s\n", price)
+	case "/create": 
+		item := r.URL.Query().Get("item")
+		price, err := strconv.ParseFloat(r.URL.Query().Get("price"), 32)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "invalid price: %s\n", r.URL.Query().Get("price"))
+			return
+		}
+		db[item] = dollars(price)
+	case "/modify":
+		item := r.URL.Query().Get("item")
+		price, err := strconv.ParseFloat(r.URL.Query().Get("price"), 32)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, "invalid price: %s\n", r.URL.Query().Get("price"))
+			return 
+		}
+		db[item] = dollars(price)
+	case "/delete":
+		item := r.URL.Query().Get("item")
+		delete(db, item) // delete 为Go内置， 按照指定的键将元素从map中删除， 若删除的键为nil或者在map中不存在， 则不进行任何操作。
+	default:
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "no such page: %s\n", r.URL)	
+	}
+}
+```
+
+### 练习7.12
+-  修改/list的handler让它把输出打印成一个HTML的表格而不是文本。html/template包（§4.6）可能会对你有帮助。
+
+```go
+// 练习7.12
+package main
+
+import (
+	"fmt"
+	"html/template"
+	"log"
+	"net/http"
+)
+
+func main() {
+	db := database{"shoes": 50, "socks": 5}
+    log.Fatal(http.ListenAndServe("localhost:8000", db))
+}
+
+type dollars float32
+var itemTable = template.Must(template.New("Items").Parse(`
+	<h1>Items</h1>
+<table>
+    <tr>
+        <th> Item </th>
+        <th> Price </th>
+    </tr>
+    {{ range $k, $v := . }}
+        <tr>
+            <td>{{ $k }}</td>
+            <td>{{ $v }}</td>
+        </tr>
+    {{end}}
+</table>
+`))
+func (d dollars) String() string { return fmt.Sprintf("$%.2f", d) }
+
+type database map[string]dollars
+
+func (db database) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/list":
+		itemTable.Execute(w, db)
+		for item, price := range db {
+			fmt.Fprintf(w, "%s: %s\n", item, price)
+		}
+	case "/price":
+		item := r.URL.Query().Get("item") // 获取参数方法
+		price, ok := db[item]
+		if ! ok{
+			w.WriteHeader(http.StatusNotFound) // 404
+			fmt.Fprintf(w, "no such item: %q\n", item)
+			return
+		}
+		fmt.Fprintf(w, "%s\n", price)
+	
+	default:
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprintf(w, "no such page: %s\n", r.URL)	
+	}
+}
+```
+
+### error 接口
+
+```go
+type error interface {
+    Error() string
+}
+```
+- 
