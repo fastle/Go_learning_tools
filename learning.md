@@ -4274,6 +4274,15 @@ f, ok := w.(*os.File)      // success:  ok, f == os.Stdout
 b, ok := w.(*bytes.Buffer) // failure: !ok, b == nil
 ```
 
+### 通过断言识别错误类型
+- 如何判断处理返回的错误的类型， 这是一个问题
+- 一个幼稚的实现会通过检查错误信息里面是否含有某个字符串来检查
+- 使用专门的类型os.PathError来表示结构化的错误值， 
+- 建议即时处理， 不然如果调用类似fmt.Errorf 之类的方法后， 结构信息就没了。
+
+- 接口有两种风格， 一种突出了满足这个接口的具体类型之间的相似性， 但是隐藏了各个具体类型的布局与各自特有的功能
+- 另一种充分利用了接口值能够容纳各种具体类型的能力， 把接口作为这些类型的联合来使用。
+- 
 ### sort.Interface
 ```go
 type Interface interface {
@@ -4876,4 +4885,292 @@ type error interface {
     Error() string
 }
 ```
-- 
+
+### 接口示例 表达式求值
+- 创建一个接口， 并进行相关测试
+
+```go
+\\ 整体代码结构较复杂， 这里仅展示前面信息的定义
+package main
+
+import (
+	"fmt"
+	"math"
+	"strconv"
+	"strings"
+	"testing"
+	"text/scanner"
+)
+
+type Expr interface {
+	Eval(env Env) float64
+}
+
+type Var string
+type literal float64
+type Env map[Var]float64
+
+type unary struct { // 一元运算符
+	op rune
+	x  Expr //当前定义下， 可以放var or literal
+}
+
+func (u unary) Eval(env Env) float64 {
+	switch u.op {
+	case '+':
+		return +u.x.Eval(env)
+	case '-':
+		return -u.x.Eval(env)
+	}
+	panic(fmt.Sprintf("unsupported unary operator: %q", u.op))
+}
+
+type binary struct { // 二元运算符
+	op   rune
+	x, y Expr
+}
+
+func (u binary) Eval(env Env) float64 {
+	switch u.op {
+	case '+':
+		return u.x.Eval(env) + u.y.Eval(env)
+	case '-':
+		return u.x.Eval(env) - u.y.Eval(env)
+	case '*':
+		return u.x.Eval(env) * u.y.Eval(env)
+	case '/':
+		return u.x.Eval(env) / u.y.Eval(env)
+	}
+	panic(fmt.Sprintf("unsupported binary operator: %q", u.op))
+}
+
+type call struct {
+	fn   string
+	args []Expr
+}
+
+func (u call) Eval(env Env) float64 {
+	switch u.fn {
+	case "pow":
+		return math.Pow(u.args[0].Eval(env), u.args[1].Eval(env))
+	case "sin":
+		return math.Sin(u.args[0].Eval(env))
+	case "sqrt":
+		return math.Sqrt(u.args[0].Eval(env))
+	}
+	panic(fmt.Sprintln("unsupported binary operator "+  u.fn))
+}
+
+
+func (v Var) Eval(env Env) float64 {
+	return env[v]
+}
+
+func (l literal) Eval(env Env) float64 {
+	return float64(l)
+}
+
+func TestEval(t *testing.T) { // 测试用例
+	tests := []struct {
+		expr string
+		env Env
+		want string 
+	}{
+		{"sqrt(A / pi)", Env{"A": 87616, "pi": math.Pi}, "167"},
+        {"pow(x, 3) + pow(y, 3)", Env{"x": 12, "y": 1}, "1729"},
+        {"pow(x, 3) + pow(y, 3)", Env{"x": 9, "y": 10}, "1729"},
+        {"5 / 9 * (F - 32)", Env{"F": -40}, "-40"},
+        {"5 / 9 * (F - 32)", Env{"F": 32}, "0"},
+        {"5 / 9 * (F - 32)", Env{"F": 212}, "100"},
+	}
+	var prevExpr string 
+	for _, test := range tests {
+		if test.expr != prevExpr {
+			fmt.Printf("\n%s\n", test.expr)
+			prevExpr = test.expr
+		}
+		expr, err := Parse(test.expr)
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		got := fmt.Sprintf("%.6g", expr.Eval(test.env))
+		fmt.Printf("\t%v => %s\n", test.env, got)
+		if got != test.want {
+			t.Errorf("%s, Eval() in %v = %q, want %q\n", test.expr, test.env, got, test.want)
+		}
+	}
+
+}
+
+```
+
+### 练习7.13 - 7.16
+-  量有点大， 先略过
+```go
+
+```
+
+### xml解码示例
+
+```go
+// Xmlselect prints the text of selected elements of an XML document.
+package main
+
+import (
+	"encoding/xml"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+)
+
+func main() {
+    dec := xml.NewDecoder(os.Stdin)
+    var stack []string // stack of element names
+    for {
+        tok, err := dec.Token()
+        if err == io.EOF {
+            break
+        } else if err != nil {
+            fmt.Fprintf(os.Stderr, "xmlselect: %v\n", err)
+            os.Exit(1)
+        }
+        switch tok := tok.(type) { // 类型分支写法
+        case xml.StartElement:
+            stack = append(stack, tok.Name.Local) // push
+        case xml.EndElement:
+            stack = stack[:len(stack)-1] // pop
+        case xml.CharData:
+            if containsAll(stack, os.Args[1:]) {
+                fmt.Printf("%s: %s\n", strings.Join(stack, " "), tok)
+            }
+        }
+    }
+}
+
+// containsAll reports whether x contains the elements of y, in order.
+func containsAll(x, y []string) bool {
+    for len(y) <= len(x) {
+        if len(y) == 0 {
+            return true
+        }
+        if x[0] == y[0] {
+            y = y[1:]
+        }
+        x = x[1:]
+    }
+    return false
+}
+
+```
+# 第八章 Goroutines 和Channels 
+
+## Goroutines 
+- 在Go语言中，每一个并发的执行单元叫做一个goroutine。
+- 使用关键字go创建新的goroutine
+- 下面是一个求斐波那契数列的程序， 
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	go spinner(100 * time.Millisecond)
+	const n = 45
+	fibN := fib(n)
+	fmt.Printf("\rFibonacci(%d) = %d\n", n, fibN)
+}
+
+func spinner(delay time.Duration) {
+/*
+time.Duration
+持续时间(Duration)表示两个瞬间之间经过的时间
+作为int64纳秒计数。该表示限制了
+最大可代表的持续时间约为290年。
+*/
+
+	for {
+		for _, r := range `-\|/` {
+			fmt.Printf("\r%c", r)
+			time.Sleep(delay)
+		}
+	}
+}
+func fib(x int) int {
+	if x < 2 {
+		return x
+	}
+	return fib(x-1) + fib(x-2)
+}
+```
+- 值得注意的是， 当主程序返回或者直接终止时， 所有goroutine 都会终止
+
+## 并发的clock服务
+
+- 首先是顺序的始终服务
+```go
+package main
+
+import (
+	"io"
+	"log"
+	"net"
+	"time"
+)
+
+func handleConn(c net.Conn) {
+	defer c.Close() // 延迟调用
+	for {
+		_, err := io.WriteString(c, time.Now().Format("15:04:05\n"))
+		if err != nil {
+			return 
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
+func main() {
+	listener, err := net.Listen("tcp", "localhost:8000")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err) // e.g., connection aborted
+			continue
+		}
+		go handleConn(conn)
+	}
+}
+```
+
+- 下面是并发的
+```go
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err) // e.g., connection aborted
+			continue
+		}
+		handleConn(conn)
+	}
+```
+
+### 练习8.1
+- 修改clock2来支持传入参数作为端口号，然后写一个clockwall的程序，这个程序可以同时与多个clock服务器通信，从多个服务器中读取时间，并且在一个表格中一次显示所有服务器传回的结果，类似于你在某些办公室里看到的时钟墙。如果你有地理学上分布式的服务器可以用的话，让这些服务器跑在不同的机器上面；或者在同一台机器上跑多个不同的实例，这些实例监听不同的端口，假装自己在不同的时区。
+```go
+
+```
+
+### 练习8.2
+- 实现一个并发FTP服务器。服务器应该解析客户端发来的一些命令，比如cd命令来切换目录，ls来列出目录内文件，get和send来传输文件，close来关闭连接。你可以用标准的ftp命令来作为客户端，或者也可以自己实现一个。
+
+## 并发的echo服务
+- 前面的clock服务器在每一个连接都会运行一个goroutine， 而在本节中我们在每个连接中运行多个goroutine
+```go
+
+```
