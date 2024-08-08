@@ -5172,5 +5172,374 @@ func main() {
 ## 并发的echo服务
 - 前面的clock服务器在每一个连接都会运行一个goroutine， 而在本节中我们在每个连接中运行多个goroutine
 ```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"net"
+	"strings"
+	"time"
+)
+
+func echo(c net.Conn, shout string, delay time.Duration) {
+	fmt.Fprintln(c, "\t", strings.ToUpper(shout))
+	time.Sleep(delay)
+	fmt.Fprintln(c, "\t", shout)
+	time.Sleep(delay)
+	fmt.Fprintln(c, "\t", strings.ToLower(shout))
+}
+
+func handleConn(c net.Conn) {
+	input := bufio.NewScanner(c)
+	for input.Scan() {
+		echo(c, input.Text(), 1*time.Second)
+	}
+	c.Close()
+}
+func main() {
+	listener, err := net.Listen("tcp", "localhost:8000")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err) // e.g., connection aborted
+			continue
+		}
+		go handleConn(conn)
+	}
+}
+```
+
+```go
+\\并发的netcat
+package main
+
+import (
+	"io"
+	"log"
+	"net"
+	"os"
+)
+
+func main() {
+    conn, err := net.Dial("tcp", "localhost:8000")
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer conn.Close()
+    go mustCopy(os.Stdout, conn)
+	mustCopy(conn, os.Stdin)
+}
+
+func mustCopy(dst io.Writer, src io.Reader) {
+    if _, err := io.Copy(dst, src); err != nil {
+        log.Fatal(err)
+    }
+}
+
+```
+- 也可以同时并行处理echo
+
+```go
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"net"
+	"strings"
+	"time"
+)
+
+func echo(c net.Conn, shout string, delay time.Duration) {
+	fmt.Fprintln(c, "\t", strings.ToUpper(shout))
+	time.Sleep(delay)
+	fmt.Fprintln(c, "\t", shout)
+	time.Sleep(delay)
+	fmt.Fprintln(c, "\t", strings.ToLower(shout))
+}
+
+func handleConn(c net.Conn) {
+	input := bufio.NewScanner(c)
+	for input.Scan() {
+		go echo(c, input.Text(), 1*time.Second)
+	}
+	c.Close()
+}
+func main() {
+	listener, err := net.Listen("tcp", "localhost:8000")
+	if err != nil {
+		log.Fatal(err)
+	}
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err) // e.g., connection aborted
+			continue
+		}
+		go handleConn(conn)
+	}
+}
+```
+
+## Channels
+- Channel是一个通信机制，允许goroutine之间传递数据。
+- 使用make 函数创建一个channel
+- channel 可以发送和接收， 其中从channel 获取的时候可以不获取接收结果。
+- channel 可以关闭， 关闭后还可以从其接收，但是不可以发送。
+- Channel 分为带缓存的和不带缓存的， 
+
+### 不带缓存的Channels 
+- 发送时会使得发送者的goroutine阻塞， 直到另一个goroutine 在相同的Channel上进行接收操作。
+- 反之，如果一个goroutine先进行接收操作， 照样会堵塞
+- 当值传送成功之后， 两个goroutine 裁可以进行后面的语句。
+
+```go
+package main
+
+import (
+	"io"
+	"log"
+	"net"
+	"os"
+)
+
+func main() {
+    conn, err := net.Dial("tcp", "localhost:8000")
+    if err != nil {
+        log.Fatal(err)
+    }
+	done:= make(chan struct{})
+	go func(){
+		io.Copy(os.Stdout, conn)
+		log.Println("done")
+		done <- struct{}{} //这里主要起到同步的作用， 如果
+	}()
+	
+    mustCopy(os.Stdout, conn)
+	conn.Close() // 这里关闭后可以让用户端 收到关闭通知
+	<- done // 如果这里先完成的话， 会先进入堵塞等待状态
+}
+
+func mustCopy(dst io.Writer, src io.Reader) {
+    if _, err := io.Copy(dst, src); err != nil {
+        log.Fatal(err)
+    }
+```
+
+### 串联的Channels (pipeline)
+- Channel可以传递任意类型的值， 以下是个示例， 由三个goroutine 使用两个channel 串联起来， 第一个是计数器，第二个是平方， 第三个是输出
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	naturals := make(chan int)
+	squares := make(chan int)
+
+	go func() {
+		for x := 0; x < 100; x++ {
+			naturals <- x // 每次进去一个数字， 这边就会堵塞
+			
+			fmt.Printf("make %d\n", x)
+		}
+	}()
+
+	go func() {
+		for {
+			x := <-naturals
+			squares <- x * x
+			fmt.Printf("squares %d\n", x)
+		}
+	}()
+	for {
+		fmt.Println(<-squares)
+		time.Sleep(time.Second)
+	}
+}
+```
+- 我们加上标记后， 可以看到输出的顺序。
+- 试图关闭一个关闭的通道会宕机
+- 在通知接收方goroutine所有数据都发送完毕的时候可以关闭通道， 关闭通道并不是必须的
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func main() {
+	naturals := make(chan int)
+	squares := make(chan int)
+
+	go func() {
+		for x := 0; x < 100; x++ {
+			naturals <- x // 每次进去一个数字， 这边就会堵塞
+			
+		//	fmt.Printf("make %d\n", x)
+		}
+		close(naturals)
+	}()
+
+	go func() {
+		for {
+			x := <-naturals
+			squares <- x * x
+		}
+		close(squares)
+	}()
+	for {
+		fmt.Println(<-squares)
+		time.Sleep(time.Second)
+	}
+}
+```
+### 单向通道
+- 可以定义只输入或者输出的管道， 作用是避免误用
+
+```go
+package main
+
+import "fmt"
+
+func counter(out chan<- int) { // 这里是定义了类型， 为单向输入或者输出型的，
+	for x := 0; x < 100; x++ {
+		out <- x
+	}
+	close(out)
+}
+
+func squarer(out chan<- int, in <-chan int) {
+	for v := range in {
+		out <- v * v
+	}
+	close(out)
+}
+
+func printer(in <-chan int) {
+	for v := range in {
+		fmt.Println(v)
+	}
+}
+
+func main() {
+	naturals := make(chan int)
+	squares := make(chan int)
+	go counter(naturals)
+	go squarer(squares, naturals)
+	printer(squares)
+}
+```
+
+### 缓冲通道
+- 缓冲通道内部是一个队列， 知道这个就好
+- 有一种Bug，叫做goroutines泄露， 这是因为goroutines没有被关闭， 通道一直被堵塞没有被关闭， 导致goroutines一直运行， 直到程序退出
+
+### 并行循环
+- 由一些完全独立的子问题组成的问题称为高度并行， 高度并行的问题最容易实现并行。
+- 并行循环常见例子， 对于循环中每个运算， 都可以开一个goroutine运行，这样做经常会出现一个错误，就是循环结束后程序直接就结束了， 我们的goroutine当然也就没有执行完成。
+- 解决方法是设置一个共享通道， 读出循环个数次（当其中由错误中断的时候可能有问题）
+- 书上又给出了一个例子， 使用通道获取出现的第一个错误并返回， 而这样也会堵塞引起goroutine泄露的错误。
+- 解决方法给出了两种， 一种是开足够大的缓冲通道， 另一种是返回时建立一个goroutine来读完通道，
+- 
+
+
+### 并发的Web爬虫
+- 这里再提一下， 对于匿名函数一般两种方法传参， 一种是后面括号直接跟着， 另一种是赋值给函数变量。然后再调用
+```go
+
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"gopl.io/ch5/links"
+)
+
+func crawl(url string) []string {
+	fmt.Println(url)
+	list, err := links.Extract(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return list 
+}
+func main() {
+	worklist := make(chan []string)
+	go func(){
+		worklist <- os.Args[1:]
+	}()
+
+	seen := make(map[string]bool)
+	for list := range worklist {
+		for _, link := range list {
+			if !seen[link] {
+				seen[link] = true
+				go func(link string) {
+					worklist <- crawl(link)
+				}(link)
+			}
+		}
+	}
+}
+```
+- 该程序会不断爬取相关网页， 书上说会执行若干秒后出现错误，1是出现某网页解析错误， 二是连接数目过多性能不够。 这里两个我都没有遇到， 三是该程序永远不会结束， 这是因为worklist没有关闭， 循环会一直堵塞， 直到程序退出。
+- 第一个改进是减少并行goroutine的数量， 采用空闲槽获取令牌来限制并发数量
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"gopl.io/ch5/links"
+)
+var tokens = make(chan struct{}, 20)
+
+func crawl(url string) []string {
+	fmt.Println(url)
+	tokens <- struct{}{} // 有槽才能启动
+	list, err := links.Extract(url)
+	<- tokens // 释放槽
+	if err != nil {
+		fmt.Println(err)
+	}
+	return list 
+}
+func main() {
+	worklist := make(chan []string)
+	go func(){
+		worklist <- os.Args[1:]
+	}()
+
+	seen := make(map[string]bool)
+	for list := range worklist {
+		for _, link := range list {
+			if !seen[link] {
+				seen[link] = true
+				go func(link string) {
+					worklist <- crawl(link)
+				}(link)
+			}
+		}
+	}
+}
+```
+- 对于第三个的改进是通过计数器来判断worklist是否结束
+```go
 
 ```

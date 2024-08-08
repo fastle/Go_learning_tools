@@ -1,0 +1,22 @@
+# 记录
+- I like eat shit, I eat shit everyday. I like eat shit, I eat shit everyday. I like eat shit, I eat shit everyday. 
+- Do you like eat shit?
+- Come on, eat shit!
+- We eat shit everyday.
+- I like eat shit.
+- You eat shit.
+- People eat shit.
+- My mother eat shit.
+- No, I don't eat shit.
+- But I eat shit.
+- Very good.
+- Zheng, you eat shit.
+- A shit.
+- Quickly, eat shit!
+- We eat shit
+- Eat shit
+- Repeat eat shit
+- Test eat shit
+- use eat shit
+- i eat shit
+- one eat shit every day i eat shit i eat shit i eat shit i eat shit, 9999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
