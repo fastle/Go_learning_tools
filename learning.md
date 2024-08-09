@@ -5498,6 +5498,7 @@ func main() {
 ```
 - 该程序会不断爬取相关网页， 书上说会执行若干秒后出现错误，1是出现某网页解析错误， 二是连接数目过多性能不够。 这里两个我都没有遇到， 三是该程序永远不会结束， 这是因为worklist没有关闭， 循环会一直堵塞， 直到程序退出。
 - 第一个改进是减少并行goroutine的数量， 采用空闲槽获取令牌来限制并发数量
+- 对于第三个的改进是通过计数器来判断worklist是否结束
 
 ```go
 package main
@@ -5539,7 +5540,403 @@ func main() {
 	}
 }
 ```
-- 对于第三个的改进是通过计数器来判断worklist是否结束
+- 另一种限制并发的思路是使用常驻的crawler goroutine 
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"gopl.io/ch5/links"
+)
+
+func crawl(url string) []string {
+	fmt.Println(url)
+	list, err := links.Extract(url)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return list 
+}
+func main() {
+	worklist := make(chan []string)
+	unseenLinks := make(chan string)
+	go func(){
+		worklist <- os.Args[1:]
+	}()
+
+	for i := 0; i < 20; i++ {
+		go func() {
+			for link := range unseenLinks { // 公用通道， for range 可以在通道被关闭的时候正常退出， 
+				foundLinks := crawl(link) 
+				go func() {worklist <- foundLinks}()
+			}
+		}()
+	}
+
+	seen := make(map[string]bool)
+	for list := range worklist {
+		for _, link := range list {
+			if !seen[link] {
+				seen[link] = true
+				unseenLinks <- link //
+			}
+		}
+	}
+}
+```
+
+### select 多路复用
+- 一个简单的倒计时发射程序如下
+
+```go
+package main
+
+import (
+	"fmt"
+	"time"
+)
+
+func launch(){
+	fmt.Println("Lift off!")
+}
+func main() {
+	fmt.Println("Commencing countdown. Press return to abort.")
+	tick := time.Tick(1 * time.Second)
+	for countdown := 10; countdown > 0; countdown--{
+		fmt.Println(countdown)
+		<-tick // 等计时器滴答
+	}
+	launch()
+}
+
+
+
+
+```
+- 现在我们想在倒计时结束前， 可以允许按下回车键来取消发射
+- 朴素来想， 我们现在西药新建一个goroutine 来监听stdin并新设置一个channel 传递信息， 然后在循环中同时监听tick 和新通道
+- 这时候可以用select来解决，
+- select 会等待case中有能够执行的case 时再去执行， 这时候其他通信不会进行
+- 多个程序同时满足时，select会随机选择一个。
+- 使用select实现我们上面要求的功能
+
+```go
+package main
+
+import (
+	"fmt"
+	"os"
+	"time"
+)
+
+func launch(){
+	fmt.Println("Lift off!")
+}
+func main() {
+	fmt.Println("Commencing countdown. Press return to abort.")
+	abort := make(chan struct{})
+	go func(){
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{} 
+	}()
+	tick := time.Tick(1 * time.Second)
+	for countdown := 10; countdown > 0; countdown--{
+		fmt.Println(countdown)
+		select {
+		case <-tick:
+		case <-abort:
+			fmt.Println("Launch aborted!")
+			return
+		}
+	}
+	launch()
+}
+
+
+
+
+```
+
+### 示例: 并发的目录遍历
+- 朴素来说是这样
+```go
+package main
+
+import (
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+)
+
+func walkDir(dir string, fileSize chan<- int64) {
+	for _, entry := range dirents(dir) {
+		if entry.IsDir() {
+			subdir := filepath.Join(dir, entry.Name())
+			walkDir(subdir, fileSize)
+		} else {
+			fileSize <- entry.Size() // 增加
+		}
+	}
+}
+
+func dirents(dir string) []os.FileInfo {
+	entries, err := ioutil.ReadDir(dir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "du1: %v\n", err)
+	}
+	return entries 
+}
+func main() {
+	flag.Parse()
+	roots := flag.Args()
+	if len(roots) == 0{
+		roots = []string{"."}
+	}
+	fileSizes := make(chan int64)
+	go func(){
+		for _, root := range roots {
+			walkDir(root, fileSizes)
+		}
+		close(fileSizes)
+	}()
+
+	var nfiles, nbytes int64
+    for size := range fileSizes {
+        nfiles++
+        nbytes += size
+    }
+    printDiskUsage(nfiles, nbytes)
+}
+
+func printDiskUsage(nfiles, nbytes int64) {
+	fmt.Printf("%d files %.1f GB\n", nfiles, float64(nbytes) / 1e9)
+}
+```
+
+- 会经历很久的运行时间，然后输出信息， 我们希望中途输出更多相关信息， 但不希望会直接输出一大坨
+- 使用上一章的select 进行改造
+
+```go
+
+var verbose = flag.Bool("v", false, "show progress")
+
+func main() {
+	flag.Parse()
+	roots := flag.Args()
+	if len(roots) == 0{
+		roots = []string{"."}
+	}
+	fileSizes := make(chan int64)
+	go func(){
+		for _, root := range roots {
+			walkDir(root, fileSizes)
+		}
+		close(fileSizes)
+	}()
+	var tick <-chan time.Time 
+	if *verbose {
+		tick = time.Tick(10 * time.Millisecond)
+	}
+	var nfiles, nbytes int64
+loop:
+    for  {
+        select {
+		case size, ok := <-fileSizes:
+			if !ok {
+				break loop //该处为关闭后返回的信息。loop 可以goto 和break
+			}
+			nfiles++
+			nbytes += size 
+		case <-tick:
+			printDiskUsage(nfiles, nbytes)
+		}
+    }
+    printDiskUsage(nfiles, nbytes)
+}
+
+```
+- 然后对遍历操作进行并发改造
+- 速度明显变快了
+```go
+package main
+
+import (
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"sync"
+	"time"
+)
+
+func walkDir(dir string, n *sync.WaitGroup, fileSize chan<- int64) {
+	defer n.Done() // 正好每个都能减到
+	for _, entry := range dirents(dir) {
+		if entry.IsDir() {
+			n.Add(1)
+			subdir := filepath.Join(dir, entry.Name())
+			go walkDir(subdir, n, fileSize)
+		} else {
+			fileSize <- entry.Size() // 传输到主逻辑增加。
+		}
+	}
+}
+
+func dirents(dir string) []os.FileInfo {
+	entries, err := ioutil.ReadDir(dir)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "du1: %v\n", err)
+	}
+	return entries 
+}
+
+var verbose = flag.Bool("v", false, "show progress")
+
+func main() {
+	flag.Parse()
+	roots := flag.Args()
+	if len(roots) == 0{
+		roots = []string{"."}
+	}
+	fileSizes := make(chan int64)
+	var n sync.WaitGroup
+	
+	for _, root := range roots {
+		n.Add(1) // 组的数目
+		go walkDir(root, &n,  fileSizes)
+	}
+	go func(){
+		n.Wait()
+		close(fileSizes)
+	}()
+
+
+	var tick <-chan time.Time 
+	if *verbose {
+		tick = time.Tick(10 * time.Millisecond)
+	}
+	var nfiles, nbytes int64
+loop:
+    for  {
+        select {
+		case size, ok := <-fileSizes:
+			if !ok {
+				break loop //该处为关闭后返回的信息。loop 可以goto 和break
+			}
+			nfiles++
+			nbytes += size 
+		case <-tick:
+			printDiskUsage(nfiles, nbytes)
+		}
+    }
+    printDiskUsage(nfiles, nbytes)
+}
+
+func printDiskUsage(nfiles, nbytes int64) {
+	fmt.Printf("%d files %.1f GB\n", nfiles, float64(nbytes) / 1e9)
+}
+```
+
+### 并发的退出
+- 使用通道来广播退出信息， 方法是平常不往里面传值， 终止时把通道关闭， 就能从通道获取零值 获取已退出信息
+- 要注意后台goroutine 针对信息快速终止
+
+### 示例 聊天服务
+```go
+package main
+
+import (
+	"bufio"
+	"log"
+	"net"
+)
+
+func main() {
+	listener, err := net.Listen("tcp", "localhost:8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+	go broadcaster()
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			log.Print(err)
+			continue
+		}
+		go handleConn(conn)
+	}
+}
+
+type client chan<- string 
+
+var (
+	entering = make(chan client)
+	leaving = make(chan client)
+	messages = make(chan string)
+)
+/*
+broadcaster监听来自全局的客户端,到来离开信息， 并且接收消息并且广播到所有客户端
+*/
+func broadcaster() {
+	clients := make(map[client]bool) 
+	for {
+		select {
+		case msg := <-messages:
+			for cli := range clients{
+				cli <- msg
+			}
+		case cli := <-entering:
+			clients[cli] = true 
+		
+		case cli := <-leaving:
+			delete(clients, cli)
+			close(cli) // 注意 删除了不代表关闭了， 关闭了才算退出
+		}
+	}
+}
+
+func handleConn(conn net.Conn) {
+	ch := make(chan string)
+	go clientWriter(conn, ch)
+	who := conn.RemoteAddr().String()
+	ch <- "You are " + who
+	messages <- who + " has arrived"
+	entering <- ch
+	input := bufio.NewScanner(conn)
+	for input.Scan() {
+		messages <- who + ": " + input.Text()
+	}
+	leaving <- ch
+	messages <- who + " has left"
+	conn.Close()
+}
+
+func clientWriter(conn net.Conn, ch <-chan string ){
+	for msg := range ch {
+		fmt.Fprintf(conn, msg)
+	}
+}
+```
+
+# 第九章 使用共享变量实现并发
+- 基本上就是锁的概念
+- 活锁：多个线程在尝试绕开死锁， 由于过分同步导致反复冲突
+
+## 竞态
+- 对于绝大多数变量，如要回避并发访问， 要么限制变量只存在在一个goroutine内， 要么维护一个更高层的互斥不变量，
+- 定义，数据竞态发生于两个goroutine并发读写同一个变量并且至少其中一个是写入时， 从定义来说， 避免数据竞态可以有三种方法， 
+1. 不改
+2. 避免多个goroutine同时访问一个变量
+3. 互斥
+
+- 第一种比较容易实现
+- 第二种可以通过使用唯一的goroutine 来获取其信息， 然后其他goroutine如果向该goroutine 来发送请求来操作， “不要通过共享内存来通信， 而是要通过通信来共享内存”
+
 ```go
 
 ```
